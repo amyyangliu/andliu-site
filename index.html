@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>&amp;Liu — Brand strategy and web design</title>
+  <meta name="description" content="Agency-caliber brand strategy and web design for startups and independent businesses. Trained at an agency on brands like Samsung and Spotify — without the agency.">
+
+  <!-- social sharing -->
+  <meta property="og:title" content="&amp;Liu — Brand strategy and web design">
+  <meta property="og:description" content="Agency-caliber work. Without the agency.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/smartthings-video-still.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;1,500&family=Italiana&family=Marcellus&family=Archivo:wght@400;500;600&display=swap">
+
+  <style>
+    /* ------------------------------------------------------------------
+       PALETTE — "Coral Pop". Change these four values to retheme the
+       entire site; every color below is derived from them.
+       ------------------------------------------------------------------ */
+    :root {
+      --bg:          #FBEEE6;  /* pale warm cream — page background */
+      --ink:         #241E1A;  /* near-black — body text, left shutter */
+      --accent:      #E2542B;  /* coral — banner, labels, about block  */
+      --shutterPale: #F9D9D0;  /* pale coral tint — right shutter      */
+
+      /* Case-study image crop. Cinematic on desktop, but a 21:9 letterbox
+         on a phone is only ~165px tall, which buries the actual work —
+         so the crop gets taller as the screen gets narrower. */
+      --case-ratio: 21/9;
+    }
+    @media (max-width: 900px) { :root { --case-ratio: 16/9; } }
+    @media (max-width: 600px) { :root { --case-ratio: 4/3;  } }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: 'Archivo', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { opacity: 0.7; }
+
+    /* ------------------------------------------------------------------
+       HERO SHUTTER ANIMATION
+       Left panel stays put the entire time — it's a solid dark fill with
+       no photo behind it, so any overshoot would flash the bare page
+       background through the gap. Only the right panel bounces.
+       ------------------------------------------------------------------ */
+    @keyframes revealRightBounce {
+      0%   { transform: translateX(0%); }
+      11%  { transform: translateX(0%);  animation-timing-function: cubic-bezier(.5,0,.7,0); }
+      14%  { transform: translateX(68%); animation-timing-function: cubic-bezier(.3,.9,.6,1); }
+      17%  { transform: translateX(46%); animation-timing-function: ease-out; }
+      19%  { transform: translateX(56%); }
+      44%  { transform: translateX(56%); }
+      50%  { transform: translateX(56%); animation-timing-function: ease-in; }
+      56%  { transform: translateX(0%); }
+      100% { transform: translateX(0%); }
+    }
+    /* full-screen brand banner, opens outward from center once the sliver has held a beat */
+    @keyframes bannerSweep {
+      0%   { transform: scaleX(0); }
+      44%  { transform: scaleX(0); animation-timing-function: cubic-bezier(.22,1,.36,1); }
+      50%  { transform: scaleX(1); }
+      84%  { transform: scaleX(1); animation-timing-function: ease-in; }
+      90%  { transform: scaleX(0); }
+      100% { transform: scaleX(0); }
+    }
+    /* the ampersand swaps to cream once the coral banner is behind it,
+       so it never disappears into its own color */
+    @keyframes ampSwap {
+      0%   { color: var(--accent); }
+      43%  { color: var(--accent); }
+      50%  { color: var(--bg); }
+      84%  { color: var(--bg); }
+      89%  { color: var(--accent); }
+      100% { color: var(--accent); }
+    }
+    @keyframes taglineFade {
+      0%   { opacity: 0; }
+      43%  { opacity: 0; }
+      50%  { opacity: 1; }
+      84%  { opacity: 1; }
+      89%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    .reveal-right { animation: revealRightBounce 7s infinite; }
+    .banner       { animation: bannerSweep 7s infinite; transform-origin: center; }
+    .amp          { animation: ampSwap 7s infinite; }
+    .tagline      { animation: taglineFade 7s infinite; }
+
+    /* ------------------------------------------------------------------
+       FLOATING NAV BADGE
+       Spins continuously. Hidden entirely while over the hero so it
+       doesn't compete with the shutter animation; fades in past it, then
+       shrinks and dims ~450ms after scrolling stops.
+       ------------------------------------------------------------------ */
+    @keyframes badgeSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .nav-badge {
+      position: fixed;
+      right: clamp(16px, 3vw, 40px);
+      bottom: clamp(16px, 3vw, 40px);
+      width:  clamp(104px, 13vw, 168px);
+      height: clamp(104px, 13vw, 168px);
+      z-index: 100;
+      transition: transform .5s ease, opacity .5s ease;
+      transform: scale(1);
+      opacity: 1;
+    }
+    .nav-badge svg { width: 100%; height: 100%; }
+    .nav-badge--idle { transform: scale(0.62); opacity: 0.55; }
+    .nav-badge--hero { opacity: 0; pointer-events: none; }
+    .nav-badge-spin  { animation: badgeSpin 16s linear infinite; transform-origin: 84px 84px; }
+
+    /* respect users who ask for less motion */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal-right, .banner, .amp, .tagline, .nav-badge-spin { animation: none; }
+      .tagline { opacity: 1; }
+      .banner  { transform: scaleX(1); }
+      .amp     { color: var(--bg); }
+      html     { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div style="width:100%;position:relative;background:var(--bg);">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero-viewport" style="width:100%;height:100vh;min-height:560px;position:relative;overflow:hidden;">
+
+    <!-- hero photo, sized to the exact slice the shutters open (50%–84% of the frame) rather than
+         full-bleed, so the whole serpentine building reads inside the reveal -->
+    <div style="position:absolute;inset:0;background:var(--bg);overflow:hidden;z-index:1;">
+      <img src="images/hero-calatrava.jpg" alt="Curved gold-tiled building facade against a teal sky" style="position:absolute;top:0;left:50%;width:34%;height:100%;object-fit:cover;">
+    </div>
+
+    <!-- shutter panels: closed at center in a dark neutral + pale coral pair, bounce open to a
+         sliver, hold, then get covered by the bold coral banner sweep -->
+    <div style="position:absolute;top:0;bottom:0;left:0;width:50%;background:var(--ink);z-index:10;"></div>
+    <div class="reveal-right" style="position:absolute;top:0;bottom:0;right:0;width:50%;background:var(--shutterPale);z-index:10;"></div>
+
+    <!-- full-screen brand banner, opens outward from center to cover shutters + photo entirely -->
+    <div class="banner" style="position:absolute;inset:0;background:var(--accent);z-index:20;"></div>
+
+    <!-- big centered tagline, revealed only while the coral banner is open -->
+    <div class="tagline" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;text-align:center;z-index:25;">
+      <div style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(30px,4.4vw,64px);line-height:1.25;letter-spacing:0.01em;color:var(--bg);">Brand strategy<br>and web design</div>
+    </div>
+
+    <!-- name, pinned on top of everything, stays put through every phase of the animation -->
+    <div style="position:absolute;top:clamp(24px,4vw,48px);left:clamp(24px,4vw,56px);max-width:620px;z-index:30;">
+      <div style="font-weight:400;font-size:clamp(44px,5.6vw,80px);line-height:1;letter-spacing:0.03em;text-shadow:0 2px 24px rgba(0,0,0,0.25);display:flex;align-items:baseline;gap:6px;"><span class="amp" style="font-family:'Marcellus',serif;">&amp;</span><span style="font-family:'Italiana',serif;color:var(--bg);">Liu</span></div>
+    </div>
+
+    <!-- hamburger, pinned top-right -->
+    <div style="position:absolute;top:clamp(28px,4.4vw,56px);right:clamp(24px,4vw,56px);z-index:30;">
+      <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true">
+        <rect width="26" height="2" style="fill:var(--ink)"></rect>
+        <rect y="8" width="26" height="2" style="fill:var(--ink)"></rect>
+        <rect y="16" width="26" height="2" style="fill:var(--ink)"></rect>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- ================= ABOUT / POSITIONING ================= -->
+  <div style="width:100%;padding:clamp(64px,9vw,120px) clamp(24px,4vw,56px);background:var(--accent);display:flex;justify-content:center;">
+    <div style="max-width:760px;text-align:center;">
+      <div style="font-family:'Italiana',serif;font-size:clamp(26px,3vw,40px);line-height:1.3;color:var(--bg);margin-bottom:24px;">Agency-caliber work. Without the agency.</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:400;font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--bg);opacity:0.88;">Trained at an agency building brands and websites for companies like Samsung and Spotify, Amy now works directly for startups and independent businesses. The same quality and the same craft — without the extra layers or enterprise minimums.</div>
+    </div>
+  </div>
+
+  <!-- ================= SELECTED WORK ================= -->
+  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) clamp(24px,4vw,56px) clamp(72px,8.5vw,112px);">
+
+    <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">Selected Work</div>
+
+    <!-- case study 1: Samsung SmartThings -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:20px;margin-bottom:32px;flex-wrap:wrap;">
+      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">Samsung SmartThings</div>
+      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Smart home app — UX &amp; product design</div>
+    </div>
+
+    <!-- video preview: still frame with a play affordance over it.
+         The real video drops in here later — swap the <img> for a <video>. -->
+    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
+      <img src="images/smartthings-video-still.jpg" alt="Still frame from the Samsung SmartThings project video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:84px;height:84px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 34px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
+        </div>
+      </div>
+      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Project reel</div>
+    </div>
+
+    <!-- case study 2: Okie Media -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:clamp(56px,7vw,96px);margin-bottom:32px;flex-wrap:wrap;">
+      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">Okie Media</div>
+      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Brand identity &amp; website — video production studio</div>
+    </div>
+
+    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
+      <img src="images/okie-media-site-still.jpg" alt="Okie Media website homepage with full-bleed video hero" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:84px;height:84px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 34px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
+        </div>
+      </div>
+      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
+    </div>
+
+    <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
+      Identity and site design for an award-winning video production studio whose work runs from NBC to Netflix.
+    </div>
+
+    <!-- case study 3: WEASE -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:clamp(56px,7vw,96px);margin-bottom:32px;flex-wrap:wrap;">
+      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">WEASE</div>
+      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Rebrand &amp; web design — Swedish cross-country ski brand</div>
+    </div>
+
+    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--ink);overflow:hidden;">
+      <img src="images/wease-site-still.jpg" alt="WEASE website product page showing the Superbia jacket" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:84px;height:84px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 34px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
+        </div>
+      </div>
+      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
+    </div>
+
+    <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
+      Full rebrand and site design for a Swedish cross-country ski startup — client workshops, market research, and a complete brand book.
+    </div>
+
+  </div>
+
+  <!-- ================= FLOATING NAV BADGE ================= -->
+  <div class="nav-badge nav-badge--hero">
+    <svg viewBox="0 0 168 168" style="display:block;overflow:visible;" aria-hidden="true">
+      <defs>
+        <path id="badge-path-main" d="M 84,22 A 62,62 0 1,1 83.99,22" fill="none"></path>
+      </defs>
+      <g class="nav-badge-spin">
+        <text font-size="18" font-weight="500" letter-spacing="0.18em" style="fill:var(--accent)">
+          <textPath href="#badge-path-main" startOffset="0%"><tspan font-family="'Archivo',sans-serif">LIU&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;HOME&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">LIU&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;HOME&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;</tspan></textPath>
+        </text>
+      </g>
+    </svg>
+  </div>
+
+</div>
+
+<script>
+  // Nav badge: hidden entirely over the hero, fades in once scrolled past it, then full
+  // size + opacity while actively scrolling, shrinking + dimming ~450ms after scrolling stops.
+  (function () {
+    var badges = document.querySelectorAll('.nav-badge');
+    var heroEl = document.querySelector('.hero-viewport');
+    var idleTimer;
+
+    function heroHeight() {
+      return heroEl ? heroEl.getBoundingClientRect().height : window.innerHeight;
+    }
+    function updateHeroState() {
+      var pastHero = window.scrollY > heroHeight() - 120;
+      badges.forEach(function (b) { b.classList.toggle('nav-badge--hero', !pastHero); });
+    }
+    function onScroll() {
+      updateHeroState();
+      badges.forEach(function (b) { b.classList.remove('nav-badge--idle'); });
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(function () {
+        badges.forEach(function (b) { b.classList.add('nav-badge--idle'); });
+      }, 450);
+    }
+
+    updateHeroState();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateHeroState, { passive: true });
+  })();
+</script>
+
+</body>
+</html>
