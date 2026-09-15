@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>&amp;Liu — Brand strategy and web design</title>
-  <meta name="description" content="Agency-caliber brand strategy and web design for startups and independent businesses. Trained at an agency on brands like Samsung and Spotify — without the agency.">
+  <meta name="description" content="Agency-caliber brand strategy and web design for startups and independent businesses. Trained at agencies on brands like Samsung and Unilever — without the agency.">
 
   <!-- social sharing -->
   <meta property="og:title" content="&amp;Liu — Brand strategy and web design">
@@ -25,9 +25,10 @@
        ------------------------------------------------------------------ */
     :root {
       --bg:          #FBEEE6;  /* pale warm cream — page background */
-      --ink:         #241E1A;  /* near-black — body text, left shutter */
+      --ink:         #000000;  /* true black — body text, cursor, trusted-by band */
       --accent:      #E2542B;  /* coral — banner, labels, about block  */
-      --shutterPale: #F9D9D0;  /* pale coral tint — right shutter      */
+      --shutterPale: #FFC200;  /* golden yellow — right shutter, matched to suzannajackson.com's hero */
+      --heroShutter: #241E1A;  /* dark warm grey — left shutter panel only, kept apart from --ink */
 
       /* Case-study image crop. Cinematic on desktop, but a 21:9 letterbox
          on a phone is only ~165px tall, which buries the actual work —
@@ -51,84 +52,159 @@
     a:hover { opacity: 0.7; }
 
     /* ------------------------------------------------------------------
-       HERO SHUTTER ANIMATION
-       Left panel stays put the entire time — it's a solid dark fill with
-       no photo behind it, so any overshoot would flash the bare page
-       background through the gap. Only the right panel bounces.
+       TRAILING CURSOR DOT
+       The native pointer stays untouched (arrow by default, hand over
+       links/buttons); this dot just trails behind it with easing, same
+       idea as yourmajesty.co's follower — a plain DOM element updated
+       on requestAnimationFrame, no cursor-image swap involved.
        ------------------------------------------------------------------ */
-    @keyframes revealRightBounce {
-      0%   { transform: translateX(0%); }
-      11%  { transform: translateX(0%);  animation-timing-function: cubic-bezier(.5,0,.7,0); }
-      14%  { transform: translateX(68%); animation-timing-function: cubic-bezier(.3,.9,.6,1); }
-      17%  { transform: translateX(46%); animation-timing-function: ease-out; }
-      19%  { transform: translateX(56%); }
-      44%  { transform: translateX(56%); }
-      50%  { transform: translateX(56%); animation-timing-function: ease-in; }
-      56%  { transform: translateX(0%); }
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--ink);
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: width .25s ease, height .25s ease, opacity .25s ease;
+    }
+    .cursor-dot--hover { width: 44px; height: 44px; }
+    @media (hover: none), (pointer: coarse) {
+      .cursor-dot { display: none; }
+    }
+
+    /* ------------------------------------------------------------------
+       HERO SHUTTER ANIMATION
+       The slam-in is a ONE-TIME entrance (iteration-count 1, forwards-
+       filled) — it is NOT part of the repeating loop. Every animation
+       below it (revealRightLoop, banner, tagline, amp, photo) shares a
+       1.65s delay so it only starts once the slam has landed, then loops
+       forever from translateX(0%)/scaleX(0)/opacity 0 back to the exact
+       same values — a true closed loop with no off-screen state anywhere
+       in it, so there is nothing to snap back to and nothing exposed
+       underneath at the restart. Only the ONE-TIME entrance ever visits
+       off-screen; the infinite loop never does.
+       Panels bleed 8vw past their outer screen edges (see markup), so nothing
+       here ever needs to expose that outer edge — only the center seam
+       matters, and only the right panel ever approaches it before landing.
+       ------------------------------------------------------------------ */
+    @keyframes slamInLeft {
+      0%   { transform: translateX(-100%); }
+      2%   { transform: translateX(-100%); animation-timing-function: cubic-bezier(.6,.04,.98,.34); }
       100% { transform: translateX(0%); }
     }
-    /* full-screen brand banner, opens outward from center once the sliver has held a beat */
+    @keyframes slamInRight {
+      0%   { transform: translateX(100%); }
+      2%   { transform: translateX(100%);   animation-timing-function: cubic-bezier(.6,.04,.98,.34); }
+      92%  { transform: translateX(-1.8%);  animation-timing-function: ease-out; }
+      96%  { transform: translateX(0.6%); }
+      100% { transform: translateX(0%); }
+    }
+    /* the repeating ambient loop: right panel bounces open to the photo
+       sliver, holds, closes, coral banner sweeps in, tagline, closes again */
+    @keyframes revealRightLoop {
+      0%     { transform: translateX(0%);  animation-timing-function: cubic-bezier(.5,0,.7,0); }
+      4%     { transform: translateX(68%); animation-timing-function: cubic-bezier(.3,.9,.6,1); }
+      9.33%  { transform: translateX(46%); animation-timing-function: ease-out; }
+      10.67% { transform: translateX(56%); }
+      25.33% { transform: translateX(56%); }
+      34.67% { transform: translateX(56%); animation-timing-function: ease-in; }
+      42.67% { transform: translateX(0%); }
+      100%   { transform: translateX(0%); }
+    }
     @keyframes bannerSweep {
-      0%   { transform: scaleX(0); }
-      44%  { transform: scaleX(0); animation-timing-function: cubic-bezier(.22,1,.36,1); }
-      50%  { transform: scaleX(1); }
-      84%  { transform: scaleX(1); animation-timing-function: ease-in; }
-      90%  { transform: scaleX(0); }
-      100% { transform: scaleX(0); }
+      0%      { transform: scaleX(0); }
+      25.33%  { transform: scaleX(0); animation-timing-function: cubic-bezier(.22,1,.36,1); }
+      34.67%  { transform: scaleX(1); }
+      81.33%  { transform: scaleX(1); animation-timing-function: ease-in; }
+      90.67%  { transform: scaleX(0); }
+      100%    { transform: scaleX(0); }
+    }
+    @keyframes taglineFade {
+      0%     { opacity: 0; }
+      25.33% { opacity: 0; }
+      34.67% { opacity: 1; }
+      81.33% { opacity: 1; }
+      89.33% { opacity: 0; }
+      100%   { opacity: 0; }
     }
     /* the ampersand swaps to cream once the coral banner is behind it,
        so it never disappears into its own color */
     @keyframes ampSwap {
-      0%   { color: var(--accent); }
-      43%  { color: var(--accent); }
-      50%  { color: var(--bg); }
-      84%  { color: var(--bg); }
-      89%  { color: var(--accent); }
-      100% { color: var(--accent); }
+      0%     { color: var(--accent); }
+      25.33% { color: var(--accent); }
+      34.67% { color: var(--bg); }
+      81.33% { color: var(--bg); }
+      89.33% { color: var(--accent); }
+      100%   { color: var(--accent); }
     }
-    @keyframes taglineFade {
-      0%   { opacity: 0; }
-      43%  { opacity: 0; }
-      50%  { opacity: 1; }
-      84%  { opacity: 1; }
-      89%  { opacity: 0; }
-      100% { opacity: 0; }
+    /* the photo stays fully transparent for the entire one-time entrance (the
+       base opacity:0 below, while the delay hasn't elapsed yet) so it can
+       never show before the panels arrive. The instant the ambient loop
+       starts, it snaps straight to fully visible — no fade — so it's
+       already sitting there the moment the shutters crack open, instead of
+       dissolving in after the gap has already appeared. It never needs to
+       hide again after that: the shutters/banner always physically cover it
+       whenever the gap isn't supposed to be open. */
+    @keyframes photoReveal {
+      0%   { opacity: 1; }
+      100% { opacity: 1; }
     }
-
-    .reveal-right { animation: revealRightBounce 7s infinite; }
-    .banner       { animation: bannerSweep 7s infinite; transform-origin: center; }
-    .amp          { animation: ampSwap 7s infinite; }
-    .tagline      { animation: taglineFade 7s infinite; }
+    .reveal-left  { animation: slamInLeft 1.65s 1 forwards; }
+    .reveal-right {
+      animation:
+        slamInRight 1.65s 1 forwards,
+        revealRightLoop 4.95s 1.65s infinite;
+    }
+    .banner       { animation: bannerSweep 4.95s 1.65s infinite; transform-origin: center; }
+    .amp          { animation: ampSwap 4.95s 1.65s infinite; }
+    .tagline      { animation: taglineFade 4.95s 1.65s infinite; }
+    .hero-photo   { opacity: 0; animation: photoReveal 1s 1.65s 1 forwards; }
 
     /* ------------------------------------------------------------------
-       FLOATING NAV BADGE
-       Spins continuously. Hidden entirely while over the hero so it
-       doesn't compete with the shutter animation; fades in past it, then
-       shrinks and dims ~450ms after scrolling stops.
+       CLIENT LOGO MARQUEE
+       Two copies of the logo set sit back to back in one flex track;
+       animating it exactly -50% loops seamlessly since that's the width
+       of one full copy. Grayscale + dim by default, full brand color on
+       hover. The track pauses on hover so the logo under the cursor
+       actually stays put — without that, the strip keeps sliding while
+       you're hovering and the color reveal ends up landing on whatever
+       logo has drifted underneath, not the one you meant.
        ------------------------------------------------------------------ */
-    @keyframes badgeSpin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
+    @keyframes logoScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
-    .nav-badge {
-      position: fixed;
-      right: clamp(16px, 3vw, 40px);
-      bottom: clamp(16px, 3vw, 40px);
-      width:  clamp(104px, 13vw, 168px);
-      height: clamp(104px, 13vw, 168px);
-      z-index: 100;
-      transition: transform .5s ease, opacity .5s ease;
-      transform: scale(1);
-      opacity: 1;
+    .logo-marquee {
+      width: 100%;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     }
-    .nav-badge svg { width: 100%; height: 100%; }
-    .nav-badge--idle { transform: scale(0.62); opacity: 0.55; }
-    .nav-badge--hero { opacity: 0; pointer-events: none; }
-    .nav-badge-spin  { animation: badgeSpin 16s linear infinite; transform-origin: 84px 84px; }
+    .logo-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      gap: clamp(56px, 7vw, 96px);
+      animation: logoScroll 34s linear infinite;
+    }
+    .logo-track:hover { animation-play-state: paused; }
+    .logo-track img {
+      height: clamp(22px, 2.6vw, 32px);
+      width: auto;
+      filter: url(#tint-yellow);
+      opacity: 0.55;
+      transition: opacity .25s ease, filter .25s ease;
+    }
+    .logo-track img:hover { filter: none; opacity: 1; }
 
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
-      .reveal-right, .banner, .amp, .tagline, .nav-badge-spin { animation: none; }
+      .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
       .tagline { opacity: 1; }
       .banner  { transform: scaleX(1); }
       .amp     { color: var(--bg); }
@@ -138,21 +214,32 @@
 </head>
 <body>
 
+<!-- hidden SVG filter: recolors any logo (PNG or SVG alike) to a flat #FFC200 using its
+     own alpha channel as a mask, so the "muted" state matches the shutter's yellow exactly
+     regardless of each brand's own original colors -->
+<svg width="0" height="0" style="position:absolute;" aria-hidden="true">
+  <filter id="tint-yellow" color-interpolation-filters="sRGB">
+    <feFlood flood-color="#FFC200" result="flood"></feFlood>
+    <feComposite in="flood" in2="SourceAlpha" operator="in"></feComposite>
+  </filter>
+</svg>
+
 <div style="width:100%;position:relative;background:var(--bg);">
 
   <!-- ================= HERO ================= -->
   <div class="hero-viewport" style="width:100%;height:100vh;min-height:560px;position:relative;overflow:hidden;">
 
-    <!-- hero photo, sized to the exact slice the shutters open (50%–84% of the frame) rather than
-         full-bleed, so the whole serpentine building reads inside the reveal -->
-    <div style="position:absolute;inset:0;background:var(--bg);overflow:hidden;z-index:1;">
-      <img src="images/hero-calatrava.jpg" alt="Curved gold-tiled building facade against a teal sky" style="position:absolute;top:0;left:50%;width:34%;height:100%;object-fit:cover;">
+    <!-- hero photo, sized to the exact slice the shutters open (50%–84% of the frame). Coral
+         fallback backdrop (not cream) so the one-time entrance never exposes a bare/awkward
+         moment — the photo itself only fades in on cue, during its own reveal window. -->
+    <div style="position:absolute;inset:0;background:var(--accent);overflow:hidden;z-index:1;">
+      <img class="hero-photo" src="images/hero-amy.jpg" alt="Amy speaking on stage at a conference, seated among floral arrangements" style="position:absolute;top:0;left:50%;width:34%;height:100%;object-fit:cover;object-position:44% center;">
     </div>
 
     <!-- shutter panels: closed at center in a dark neutral + pale coral pair, bounce open to a
          sliver, hold, then get covered by the bold coral banner sweep -->
-    <div style="position:absolute;top:0;bottom:0;left:0;width:50%;background:var(--ink);z-index:10;"></div>
-    <div class="reveal-right" style="position:absolute;top:0;bottom:0;right:0;width:50%;background:var(--shutterPale);z-index:10;"></div>
+    <div class="reveal-left" style="position:absolute;top:0;bottom:0;left:-8vw;width:calc(50% + 8vw);background:var(--heroShutter);z-index:10;"></div>
+    <div class="reveal-right" style="position:absolute;top:0;bottom:0;right:-8vw;width:calc(50% + 8vw);background:var(--shutterPale);z-index:10;"></div>
 
     <!-- full-screen brand banner, opens outward from center to cover shutters + photo entirely -->
     <div class="banner" style="position:absolute;inset:0;background:var(--accent);z-index:20;"></div>
@@ -178,16 +265,47 @@
 
   </div>
 
-  <!-- ================= ABOUT / POSITIONING ================= -->
-  <div style="width:100%;padding:clamp(64px,9vw,120px) clamp(24px,4vw,56px);background:var(--accent);display:flex;justify-content:center;">
-    <div style="max-width:760px;text-align:center;">
-      <div style="font-family:'Italiana',serif;font-size:clamp(26px,3vw,40px);line-height:1.3;color:var(--bg);margin-bottom:24px;">Agency-caliber work. Without the agency.</div>
-      <div style="font-family:'Archivo',sans-serif;font-weight:400;font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--bg);opacity:0.88;">Trained at an agency building brands and websites for companies like Samsung and Spotify, Amy now works directly for startups and independent businesses. The same quality and the same craft — without the extra layers or enterprise minimums.</div>
+  <!-- ================= ABOUT + TRUSTED BY =================
+       One continuous section, same background throughout. The coral rule is
+       back to being a flourish above the headline; "Trusted By" is set in the
+       same italic serif already used for the case-study subtitles below (e.g.
+       "Smart home app — UX & product design"), so it reads as this section's
+       own voice rather than a bolted-on eyebrow label. -->
+  <div style="width:100%;padding:clamp(64px,9vw,120px) 0 clamp(56px,7vw,80px);background:var(--bg);">
+
+    <div style="max-width:760px;margin:0 auto;padding:0 clamp(24px,4vw,56px);text-align:center;">
+      <div style="width:48px;height:3px;background:var(--accent);margin:0 auto 28px;"></div>
+      <div style="font-family:'Marcellus',serif;font-size:clamp(26px,3vw,40px);line-height:1.3;color:var(--ink);margin-bottom:24px;">Agency-caliber work. Without the agency.</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:400;font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--ink);opacity:0.72;">Trained at agencies building brands and websites for companies like Samsung and Unilever, Amy now works directly for startups and independent businesses. The same quality and the same craft — without the extra layers or enterprise minimums.</div>
     </div>
+
+    <div style="text-align:center;font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(15px,1.4vw,18px);color:var(--ink);margin:clamp(48px,6.5vw,72px) 0 clamp(24px,3vw,32px);">Trusted by</div>
+
+    <div class="logo-marquee">
+      <div class="logo-track">
+        <img src="images/logos/hm.svg" alt="H&amp;M">
+        <img src="images/logos/unilever.svg" alt="Unilever">
+        <img src="images/logos/heineken.svg" alt="Heineken">
+        <img src="images/logos/samsung.svg" alt="Samsung">
+        <img src="images/logos/amgen.svg" alt="Amgen">
+        <img src="images/logos/shiseido.svg" alt="Shiseido">
+        <img src="images/logos/underarmour.svg" alt="Under Armour">
+        <img src="images/logos/frieslandcampina.png" alt="FrieslandCampina">
+        <img src="images/logos/hm.svg" alt="" aria-hidden="true">
+        <img src="images/logos/unilever.svg" alt="" aria-hidden="true">
+        <img src="images/logos/heineken.svg" alt="" aria-hidden="true">
+        <img src="images/logos/samsung.svg" alt="" aria-hidden="true">
+        <img src="images/logos/amgen.svg" alt="" aria-hidden="true">
+        <img src="images/logos/shiseido.svg" alt="" aria-hidden="true">
+        <img src="images/logos/underarmour.svg" alt="" aria-hidden="true">
+        <img src="images/logos/frieslandcampina.png" alt="" aria-hidden="true">
+      </div>
+    </div>
+
   </div>
 
   <!-- ================= SELECTED WORK ================= -->
-  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) clamp(24px,4vw,56px) clamp(72px,8.5vw,112px);">
+  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) clamp(24px,4vw,56px) clamp(72px,8.5vw,112px);background:#FFFFFF;">
 
     <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">Selected Work</div>
 
@@ -197,16 +315,11 @@
       <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Smart home app — UX &amp; product design</div>
     </div>
 
-    <!-- video preview: still frame with a play affordance over it.
-         The real video drops in here later — swap the <img> for a <video>. -->
+    <!-- video preview: real project reel, muted so autoplay is allowed by browsers;
+         starts playing once scrolled into view and pauses once scrolled away (see script). -->
     <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
-      <img src="images/smartthings-video-still.jpg" alt="Still frame from the Samsung SmartThings project video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-        <div style="width:84px;height:84px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 34px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;">
-          <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
-        </div>
-      </div>
+      <video class="scroll-autoplay-video" src="images/smartthings-reel.mp4" poster="images/smartthings-video-still.jpg" muted loop playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
       <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Project reel</div>
     </div>
 
@@ -254,49 +367,64 @@
 
   </div>
 
-  <!-- ================= FLOATING NAV BADGE ================= -->
-  <div class="nav-badge nav-badge--hero">
-    <svg viewBox="0 0 168 168" style="display:block;overflow:visible;" aria-hidden="true">
-      <defs>
-        <path id="badge-path-main" d="M 84,22 A 62,62 0 1,1 83.99,22" fill="none"></path>
-      </defs>
-      <g class="nav-badge-spin">
-        <text font-size="18" font-weight="500" letter-spacing="0.18em" style="fill:var(--accent)">
-          <textPath href="#badge-path-main" startOffset="0%"><tspan font-family="'Archivo',sans-serif">LIU&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;HOME&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">LIU&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;HOME&#160;</tspan><tspan font-family="'Marcellus',serif" font-size="21">&amp;</tspan><tspan font-family="'Archivo',sans-serif">&#160;</tspan></textPath>
-        </text>
-      </g>
-    </svg>
-  </div>
-
 </div>
 
+<div class="cursor-dot" aria-hidden="true"></div>
+
 <script>
-  // Nav badge: hidden entirely over the hero, fades in once scrolled past it, then full
-  // size + opacity while actively scrolling, shrinking + dimming ~450ms after scrolling stops.
+  // Case study videos: play once scrolled into view, pause once scrolled away.
   (function () {
-    var badges = document.querySelectorAll('.nav-badge');
-    var heroEl = document.querySelector('.hero-viewport');
-    var idleTimer;
+    var videos = document.querySelectorAll('.scroll-autoplay-video');
+    if (!videos.length || !('IntersectionObserver' in window)) return;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.play().catch(function () {});
+        } else {
+          entry.target.pause();
+        }
+      });
+    }, { threshold: 0.4 });
+    videos.forEach(function (v) { observer.observe(v); });
+  })();
 
-    function heroHeight() {
-      return heroEl ? heroEl.getBoundingClientRect().height : window.innerHeight;
-    }
-    function updateHeroState() {
-      var pastHero = window.scrollY > heroHeight() - 120;
-      badges.forEach(function (b) { b.classList.toggle('nav-badge--hero', !pastHero); });
-    }
-    function onScroll() {
-      updateHeroState();
-      badges.forEach(function (b) { b.classList.remove('nav-badge--idle'); });
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(function () {
-        badges.forEach(function (b) { b.classList.add('nav-badge--idle'); });
-      }, 450);
-    }
+  // Trailing cursor dot: eases toward the real pointer position every frame (the "lag"),
+  // and grows when hovering anything clickable. Skipped for touch devices and for anyone
+  // who's asked for reduced motion, since the whole point of it is motion.
+  (function () {
+    var dot = document.querySelector('.cursor-dot');
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var noHover = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    if (!dot || reduceMotion || noHover) return;
 
-    updateHeroState();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', updateHeroState, { passive: true });
+    var mouseX = 0, mouseY = 0, dotX = 0, dotY = 0, started = false;
+
+    window.addEventListener('mousemove', function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!started) {
+        dotX = mouseX;
+        dotY = mouseY;
+        started = true;
+        dot.style.opacity = '1';
+      }
+    });
+    document.addEventListener('mouseleave', function () { dot.style.opacity = '0'; });
+    document.addEventListener('mouseenter', function () { if (started) dot.style.opacity = '1'; });
+
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest && e.target.closest('a, button')) dot.classList.add('cursor-dot--hover');
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest && e.target.closest('a, button')) dot.classList.remove('cursor-dot--hover');
+    });
+
+    (function tick() {
+      dotX += (mouseX - dotX) * 0.18;
+      dotY += (mouseY - dotY) * 0.18;
+      dot.style.transform = 'translate(' + dotX + 'px, ' + dotY + 'px) translate(-50%, -50%)';
+      requestAnimationFrame(tick);
+    })();
   })();
 </script>
 
