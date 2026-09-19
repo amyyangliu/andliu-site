@@ -169,11 +169,15 @@
        CLIENT LOGO MARQUEE
        Two copies of the logo set sit back to back in one flex track;
        animating it exactly -50% loops seamlessly since that's the width
-       of one full copy. Grayscale + dim by default, full brand color on
-       hover. The track pauses on hover so the logo under the cursor
-       actually stays put — without that, the strip keeps sliding while
-       you're hovering and the color reveal ends up landing on whatever
-       logo has drifted underneath, not the one you meant.
+       of one full copy. The band sits on the hero's shutter yellow, with
+       every logo a warm dark grey until hovered, when it lights up in its
+       own brand colors and bubbles up ~35% (the overshoot easing is what
+       makes it pop rather than just grow). The track pauses on hover so
+       the logo under the cursor actually stays put — without that, the
+       strip keeps sliding while you're hovering and the reveal ends up
+       landing on whatever logo has drifted underneath, not the one you
+       meant. The marquee has vertical padding because overflow:hidden
+       would otherwise clip the top and bottom of a magnified logo.
        ------------------------------------------------------------------ */
     @keyframes logoScroll {
       from { transform: translateX(0); }
@@ -182,6 +186,7 @@
     .logo-marquee {
       width: 100%;
       overflow: hidden;
+      padding: 18px 0;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
       mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     }
@@ -196,15 +201,16 @@
     .logo-track img {
       height: clamp(22px, 2.6vw, 32px);
       width: auto;
-      filter: url(#tint-yellow);
-      opacity: 0.55;
-      transition: opacity .25s ease, filter .25s ease;
+      filter: url(#tint-grey);
+      opacity: 0.75;
+      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
     }
-    .logo-track img:hover { filter: none; opacity: 1; }
+    .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
 
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
+      .logo-track img:hover { transform: none; }
       .tagline { opacity: 1; }
       .banner  { transform: scaleX(1); }
       .amp     { color: var(--bg); }
@@ -214,12 +220,12 @@
 </head>
 <body>
 
-<!-- hidden SVG filter: recolors any logo (PNG or SVG alike) to a flat #FFC200 using its
-     own alpha channel as a mask, so the "muted" state matches the shutter's yellow exactly
-     regardless of each brand's own original colors -->
+<!-- hidden SVG filter: recolors any logo (PNG or SVG alike) to a flat warm dark grey using its
+     own alpha channel as a mask, so the "muted" state is uniform regardless of each brand's
+     own original colors -->
 <svg width="0" height="0" style="position:absolute;" aria-hidden="true">
-  <filter id="tint-yellow" color-interpolation-filters="sRGB">
-    <feFlood flood-color="#FFC200" result="flood"></feFlood>
+  <filter id="tint-grey" color-interpolation-filters="sRGB">
+    <feFlood flood-color="#4A433D" result="flood"></feFlood>
     <feComposite in="flood" in2="SourceAlpha" operator="in"></feComposite>
   </filter>
 </svg>
@@ -265,13 +271,9 @@
 
   </div>
 
-  <!-- ================= ABOUT + TRUSTED BY =================
-       One continuous section, same background throughout. The coral rule is
-       back to being a flourish above the headline; "Trusted By" is set in the
-       same italic serif already used for the case-study subtitles below (e.g.
-       "Smart home app — UX & product design"), so it reads as this section's
-       own voice rather than a bolted-on eyebrow label. -->
-  <div style="width:100%;padding:clamp(64px,9vw,120px) 0 clamp(56px,7vw,80px);background:var(--bg);">
+  <!-- ================= ABOUT =================
+       The coral rule is a flourish above the headline. -->
+  <div style="width:100%;padding:clamp(64px,9vw,120px) 0;background:var(--bg);">
 
     <div style="max-width:760px;margin:0 auto;padding:0 clamp(24px,4vw,56px);text-align:center;">
       <div style="width:48px;height:3px;background:var(--accent);margin:0 auto 28px;"></div>
@@ -279,7 +281,16 @@
       <div style="font-family:'Archivo',sans-serif;font-weight:400;font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--ink);opacity:0.72;">Trained at agencies building brands and websites for companies like Samsung and Unilever, Amy now works directly for startups and independent businesses. The same quality and the same craft — without the extra layers or enterprise minimums.</div>
     </div>
 
-    <div style="text-align:center;font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(15px,1.4vw,18px);color:var(--ink);margin:clamp(48px,6.5vw,72px) 0 clamp(24px,3vw,32px);">Trusted by</div>
+  </div>
+
+  <!-- ================= TRUSTED BY =================
+       Full-width band in the hero's shutter yellow. "Trusted By" is set in the
+       same italic serif already used for the case-study subtitles below (e.g.
+       "Smart home app — UX & product design"), so it reads as this section's
+       own voice rather than a bolted-on eyebrow label. -->
+  <div style="width:100%;padding:clamp(36px,4.5vw,56px) 0;background:var(--shutterPale);">
+
+    <div style="text-align:center;font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(15px,1.4vw,18px);color:var(--ink);margin:0 0 clamp(6px,1.4vw,14px);">Trusted by</div>
 
     <div class="logo-marquee">
       <div class="logo-track">
