@@ -221,6 +221,68 @@
     }
     .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
 
+    /* ------------------------------------------------------------------
+       CONTACT FORM
+       Dark band closing the page (same --heroShutter as the hero's left
+       panel), cream text, yellow button. Fields are underline-only to
+       match the editorial serif type above.
+       ------------------------------------------------------------------ */
+    .contact-field { display: block; margin-bottom: 32px; }
+    .contact-field span {
+      display: block;
+      font-family: 'Archivo', sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bg);
+      opacity: 0.7;
+      margin-bottom: 8px;
+    }
+    .contact-field input,
+    .contact-field textarea {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(251, 238, 230, 0.4);
+      border-radius: 0;
+      padding: 10px 0;
+      font-family: 'Archivo', sans-serif;
+      font-size: 18px;
+      color: var(--bg);
+      outline: none;
+      transition: border-color .2s ease;
+    }
+    .contact-field textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
+    .contact-field input:focus,
+    .contact-field textarea:focus { border-bottom-color: var(--shutterPale); }
+    .contact-hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
+    .contact-submit {
+      font-family: 'Archivo', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--shutterPale);
+      color: var(--ink);
+      border: 0;
+      padding: 18px 40px;
+      cursor: pointer;
+      transition: opacity .2s ease;
+    }
+    .contact-submit:hover { opacity: 0.85; }
+    .contact-submit:disabled { opacity: 0.5; cursor: default; }
+    .contact-submit:focus-visible { outline: 2px solid var(--bg); outline-offset: 3px; }
+    .contact-status {
+      margin-top: 20px;
+      min-height: 1.5em;
+      font-family: 'Archivo', sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--bg);
+    }
+    .contact-status--error { color: var(--shutterPale); }
+
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
@@ -392,6 +454,32 @@
 
   </div>
 
+  <!-- ================= CONTACT ================= -->
+  <div id="contact" style="width:100%;padding:clamp(72px,9vw,128px) clamp(24px,4vw,56px) clamp(56px,6vw,80px);background:var(--heroShutter);">
+    <div style="max-width:720px;margin:0 auto;">
+
+      <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--shutterPale);">Contact</div>
+      <div style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(34px,4.4vw,60px);line-height:1.15;color:var(--bg);margin:20px 0 16px;">Let&rsquo;s build something.</div>
+      <div style="font-family:'Archivo',sans-serif;font-size:clamp(17px,1.5vw,20px);line-height:1.6;color:var(--bg);opacity:0.72;margin-bottom:56px;">Tell me a little about your project. I read every message and reply within two business days.</div>
+
+      <form id="contact-form" novalidate>
+        <label class="contact-field"><span>Name</span><input type="text" name="name" autocomplete="name" required></label>
+        <label class="contact-field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+        <label class="contact-field"><span>About your project</span><textarea name="message" rows="5" required></textarea></label>
+        <!-- honeypot: real visitors never see or fill this; bots do -->
+        <label class="contact-hp" aria-hidden="true">Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+        <button type="submit" class="contact-submit">Send message</button>
+        <div class="contact-status" role="status" aria-live="polite"></div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div style="width:100%;padding:0 clamp(24px,4vw,56px) 40px;background:var(--heroShutter);">
+    <div style="max-width:720px;margin:0 auto;padding-top:32px;border-top:1px solid rgba(251,238,230,0.2);font-family:'Archivo',sans-serif;font-size:13px;color:var(--bg);opacity:0.55;">&copy; 2026 &amp;Liu</div>
+  </div>
+
 </div>
 
 <div class="cursor-dot" aria-hidden="true"></div>
@@ -411,6 +499,55 @@
       });
     }, { threshold: 0.4 });
     videos.forEach(function (v) { observer.observe(v); });
+  })();
+
+  // Contact form: validates, then POSTs to a form-handling service (Formspree-style: multipart
+  // POST + Accept: application/json). Paste the service's endpoint URL below to go live.
+  (function () {
+    var FORM_ENDPOINT = ''; // e.g. 'https://formspree.io/f/xxxxxxxx'
+
+    var form = document.getElementById('contact-form');
+    if (!form) return;
+    var status = form.querySelector('.contact-status');
+    var button = form.querySelector('.contact-submit');
+
+    function say(msg, isError) {
+      status.textContent = msg;
+      status.classList.toggle('contact-status--error', !!isError);
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      if (data.get('_gotcha')) return; // bot: silently drop
+
+      var email = String(data.get('email') || '').trim();
+      if (!String(data.get('name') || '').trim() || !String(data.get('message') || '').trim()) {
+        say('Please fill in your name and a short message.', true);
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        say('That email address doesn’t look right.', true);
+        return;
+      }
+      if (!FORM_ENDPOINT) {
+        say('The form isn’t connected yet.', true);
+        return;
+      }
+
+      button.disabled = true;
+      say('Sending…', false);
+      fetch(FORM_ENDPOINT, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+        .then(function (res) {
+          if (!res.ok) throw new Error('bad response');
+          form.reset();
+          say('Thank you — your message is on its way. I’ll be in touch soon.', false);
+        })
+        .catch(function () {
+          say('Something went wrong sending that. Please try again in a moment.', true);
+        })
+        .then(function () { button.disabled = false; });
+    });
   })();
 
   // Trailing cursor dot: eases toward the real pointer position every frame (the "lag"),
