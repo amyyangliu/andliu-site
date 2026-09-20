@@ -245,16 +245,23 @@
       transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
     }
     /* The light-up has two triggers that do the same thing. Mouse devices use :hover. Touch
-       screens have no hover (iOS fakes it by leaving :hover stuck on whatever was tapped last,
-       which is unreliable), so a script toggles .is-lit / .is-held on tap instead. Hover rules
-       are limited to hover-capable devices so the two never fight. */
+       screens have no hover (iOS fakes it by leaving :hover stuck on whatever was touched last,
+       which is unreliable), so a script toggles .is-lit / .is-held while a finger is on a logo
+       instead. Hover rules are limited to hover-capable devices so the two never fight. */
     @media (hover: hover) {
       .logo-track:hover { animation-play-state: paused; }
       .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
     }
     .logo-track.is-held { animation-play-state: paused; }
     .logo-track img.is-lit { filter: none; opacity: 1; transform: scale(1.35); }
-    @media (hover: none) { .logo-track img { cursor: pointer; } } /* makes iOS treat taps on them as clicks */
+    /* pressing a logo shouldn't flash a tap highlight or pop iOS's Save Image / drag menu */
+    .logo-track img {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     /* ------------------------------------------------------------------
        CONTACT FORM
@@ -710,36 +717,45 @@
     });
   })();
 
-  // Logo strip on touch screens: there's no hover there, so a tap lights a logo up (full color,
-  // bubble, strip paused) the way hover does on a computer. Tap it again, tap anywhere else, or
-  // wait a few seconds and it settles back to grey. The click listener sits on the strip itself
-  // (iOS ignores taps that only bubble up to document), and the outside-tap listener uses
-  // touchstart, which fires everywhere.
+  // Logo strip on touch screens: there's no hover there, so pressing a logo lights it up (full
+  // color, bubble) and holds the strip still under your finger, the way hover does on a
+  // computer. Lifting your finger sets the strip scrolling again right away, from the same
+  // spot; the logo stays lit for a moment while it drifts off, then settles back to grey.
+  // Dragging (i.e. scrolling the page) cancels it at once. touch events work on any element
+  // in iOS, unlike click, which it drops for taps that only bubble up to document.
   (function () {
     var track = document.querySelector('.logo-track');
     if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
-    var lit = null, timer = null;
+    var lit = null, timer = null, startX = 0, startY = 0;
 
-    function settle() {
+    function unlight() {
       clearTimeout(timer);
       if (lit) lit.classList.remove('is-lit');
-      track.classList.remove('is-held');
       lit = null;
     }
+    function release() { track.classList.remove('is-held'); } // strip scrolls again
+    function cancel() { release(); unlight(); }
+    function letGo() { release(); clearTimeout(timer); timer = setTimeout(unlight, 1200); }
 
-    track.addEventListener('click', function (e) {
+    track.addEventListener('touchstart', function (e) {
       var img = e.target.closest ? e.target.closest('img') : null;
       if (!img) return;
-      var wasLit = img === lit;
-      settle();
-      if (wasLit) return;
+      unlight();
       lit = img;
       img.classList.add('is-lit');
       track.classList.add('is-held');
-      timer = setTimeout(settle, 4000);
-    });
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    track.addEventListener('touchmove', function (e) {
+      if (!lit) return;
+      var t = e.touches[0];
+      if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) cancel();
+    }, { passive: true });
+    track.addEventListener('touchend', letGo);
+    track.addEventListener('touchcancel', cancel); // the browser took the gesture over to scroll
     document.addEventListener('touchstart', function (e) {
-      if (!e.target.closest || !e.target.closest('.logo-track')) settle();
+      if (!e.target.closest || !e.target.closest('.logo-track')) cancel();
     }, { passive: true });
   })();
 
