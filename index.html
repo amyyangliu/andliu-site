@@ -252,12 +252,21 @@
     .logo-track img {
       flex: none;
       max-width: none;
-      height: clamp(22px, 2.6vw, 32px);
+      height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
       width: auto;
       filter: brightness(0) invert(0.27); /* any logo -> flat warm-neutral dark grey */
       opacity: 0.75;
       transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
     }
+    /* Optical balance. With one shared height, wide wordmarks (Samsung) read far bigger than compact
+       marks (H&M, Under Armour, FrieslandCampina). Each logo's height is multiplied by a scale so
+       their visible size (geometric mean of ink width x height) lands in the same range. It's a
+       uniform scale of the height with width:auto, so every logo keeps its proportions, and it only
+       changes height, so none of the Safari-safe rules above are touched. */
+    .logo-track img[src$="hm.svg"]              { --logo-scale: 1.45; }
+    .logo-track img[src$="samsung.svg"]         { --logo-scale: 0.88; }
+    .logo-track img[src$="underarmour.svg"]     { --logo-scale: 1.5; }
+    .logo-track img[src$="frieslandcampina.png"]{ --logo-scale: 1.35; }
     /* The light-up has two triggers that do the same thing. Mouse devices use :hover. Touch
        screens have no hover (iOS fakes it by leaving :hover stuck on whatever was touched last,
        which is unreliable), so a script toggles .is-lit / .is-held while a finger is on a logo
