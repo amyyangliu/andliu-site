@@ -332,6 +332,10 @@
       top: calc(clamp(28px, 4.4vw, 56px) - 14px);
       right: calc(clamp(24px, 4vw, 56px) - 14px);
       z-index: 30;
+      /* own compositing layer, same reason as the name: keeps iPhone Safari from painting the
+         animated shutters over the icon on first load */
+      transform: translateZ(0);
+      will-change: transform;
       padding: 14px;
       background: none;
       border: 0;
@@ -432,8 +436,11 @@
       <div style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(30px,4.4vw,64px);line-height:1.25;letter-spacing:0.01em;color:var(--bg);">Brand strategy<br>and web design</div>
     </div>
 
-    <!-- name, pinned on top of everything, stays put through every phase of the animation -->
-    <div style="position:absolute;top:clamp(24px,4vw,48px);left:clamp(24px,4vw,56px);max-width:620px;z-index:30;">
+    <!-- name, pinned on top of everything, stays put through every phase of the animation.
+         translateZ(0)/will-change give it its own compositing layer: the shutters and banner
+         below it are animated (so Safari composites them), and without this iPhone Safari can
+         paint them over the name on first load until a scroll forces a repaint. -->
+    <div style="position:absolute;top:clamp(24px,4vw,48px);left:clamp(24px,4vw,56px);max-width:620px;z-index:30;transform:translateZ(0);will-change:transform;">
       <div style="font-weight:400;font-size:clamp(44px,5.6vw,80px);line-height:1;letter-spacing:0.03em;text-shadow:0 2px 24px rgba(0,0,0,0.25);display:flex;align-items:baseline;gap:6px;"><span class="amp" style="font-family:'Marcellus',serif;">&amp;</span><span style="font-family:'Italiana',serif;color:var(--bg);">Liu</span></div>
     </div>
 
