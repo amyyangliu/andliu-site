@@ -203,25 +203,45 @@
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
     }
+    /* Safari-safe on purpose. On iPhone, a mask-image on an overflow:hidden parent, plus an SVG
+       url() filter on the images, plus a moving track made chunks of the logos vanish as they
+       scrolled back into view. So: the edge fades are two overlays in the band's own yellow (not
+       a mask), the grey tint is plain CSS filter functions (not an SVG filter), and the track is
+       a stable composited layer. */
     .logo-marquee {
+      position: relative;
       width: 100%;
       overflow: hidden;
       padding: 18px 0;
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     }
+    .logo-marquee::before,
+    .logo-marquee::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 8%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* the rgba is --shutterPale (#FFC200) at 0% alpha: keep them in sync */
+    .logo-marquee::before { left: 0;  background: linear-gradient(90deg,  var(--shutterPale), rgba(255, 194, 0, 0)); }
+    .logo-marquee::after  { right: 0; background: linear-gradient(270deg, var(--shutterPale), rgba(255, 194, 0, 0)); }
     .logo-track {
       display: flex;
       align-items: center;
       width: max-content;
       gap: clamp(56px, 7vw, 96px);
       animation: logoScroll 34s linear infinite;
+      will-change: transform;
     }
     .logo-track:hover { animation-play-state: paused; }
     .logo-track img {
+      flex: none;
+      max-width: none;
       height: clamp(22px, 2.6vw, 32px);
       width: auto;
-      filter: url(#tint-grey);
+      filter: brightness(0) invert(0.27); /* any logo -> flat warm-neutral dark grey */
       opacity: 0.75;
       transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
     }
@@ -374,16 +394,6 @@
   </style>
 </head>
 <body>
-
-<!-- hidden SVG filter: recolors any logo (PNG or SVG alike) to a flat warm dark grey using its
-     own alpha channel as a mask, so the "muted" state is uniform regardless of each brand's
-     own original colors -->
-<svg width="0" height="0" style="position:absolute;" aria-hidden="true">
-  <filter id="tint-grey" color-interpolation-filters="sRGB">
-    <feFlood flood-color="#4A433D" result="flood"></feFlood>
-    <feComposite in="flood" in2="SourceAlpha" operator="in"></feComposite>
-  </filter>
-</svg>
 
 <div style="width:100%;position:relative;background:var(--bg);">
 
