@@ -48,12 +48,16 @@
       /* Horizontal page gutter. The Selected Work section pads itself by this, and the
          case-study media breaks back out of it by the same amount to run edge to edge. */
       --gutter: clamp(24px, 4vw, 56px);
+
+      /* Height of the fixed compact header. Section jumps stop this far below the top so the
+         header never covers a section's heading. */
+      --header-h: clamp(56px, 6vw, 68px);
     }
     @media (max-width: 900px) { :root { --case-ratio: 16/9; } }
     @media (max-width: 600px) { :root { --case-ratio: 4/3;  } }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
     body {
       margin: 0;
       background: var(--bg);
@@ -411,8 +415,70 @@
     .menu-close:hover { color: var(--ink); }
     .menu-close:focus-visible { outline: 2px solid var(--bg); outline-offset: 2px; }
 
+    /* ------------------------------------------------------------------
+       SITE HEADER
+       A compact bar, &Liu on the left and the hamburger on the right, that follows you down
+       the page. It stays hidden while the hero's own big name and icon are on screen, fades in
+       once they've scrolled away (transparent over the rest of the hero), and turns solid
+       dark once the hero is behind it, so it stays readable over the work. It reuses the
+       hero's .amp class so the ampersand swaps color in step with the banner while transparent;
+       once solid it stays coral.
+       ------------------------------------------------------------------ */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--gutter);
+      background: transparent;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity .3s ease, transform .3s ease, background-color .3s ease, box-shadow .3s ease, visibility 0s .3s;
+    }
+    .site-header.is-on {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition: opacity .3s ease, transform .3s ease, background-color .3s ease, box-shadow .3s ease;
+    }
+    .site-header.is-solid { background: var(--heroShutter); box-shadow: 0 1px 0 rgba(251, 238, 230, 0.12); }
+    .site-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-size: clamp(28px, 3vw, 36px);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--bg);
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+    }
+    .site-logo .amp { font-family: 'Marcellus', serif; }
+    .site-logo .liu { font-family: 'Italiana', serif; color: var(--bg); }
+    .site-logo:hover { opacity: 0.8; }
+    .site-logo:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
+    .site-header.is-solid .amp { animation: none; color: var(--accent); }
+    /* the header's hamburger sits in the flex row instead of being pinned inside the hero; the
+       negative margin cancels its 14px tap padding so the three lines line up with the gutter */
+    .site-header .menu-toggle {
+      position: relative;
+      top: auto;
+      right: auto;
+      margin-right: -14px;
+      color: var(--ink);
+      transition: color .3s ease;
+    }
+    .site-header.is-solid .menu-toggle { color: var(--bg); }
+    [tabindex="-1"]:focus { outline: none; } /* sections take focus after a menu jump, without a ring */
+
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
+      .site-header, .site-header .menu-toggle { transition: none; }
       .menu, .menu li { transition: none; }
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
       .logo-track img:hover, .logo-track img.is-lit { transform: none; }
@@ -425,7 +491,20 @@
 </head>
 <body>
 
-<div style="width:100%;position:relative;background:var(--bg);">
+<!-- compact header: appears once the hero's own name and menu icon have scrolled away
+     (see the script at the bottom) -->
+<header class="site-header" id="site-header">
+  <a class="site-logo" href="#top" aria-label="&amp;Liu, back to top"><span class="amp">&amp;</span><span class="liu">Liu</span></a>
+  <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+    <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true">
+      <rect width="26" height="2" style="fill:currentColor"></rect>
+      <rect y="8" width="26" height="2" style="fill:currentColor"></rect>
+      <rect y="16" width="26" height="2" style="fill:currentColor"></rect>
+    </svg>
+  </button>
+</header>
+
+<div id="top" style="width:100%;position:relative;background:var(--bg);">
 
   <!-- ================= HERO ================= -->
   <div class="hero-viewport" style="width:100%;height:100vh;min-height:560px;position:relative;overflow:hidden;">
@@ -689,33 +768,60 @@
     });
   })();
 
-  // Site menu: the hamburger opens it; the links jump to their sections (the smooth scrolling
-  // comes from the html rule). Closes on the X, on Escape, or on any link. Page scroll is
-  // locked while it's open, and Tab is kept inside it.
+  // Site menu + compact header.
+  // - Two hamburgers (the hero's own and the one in the fixed header) open the same full-screen
+  //   menu. Its links close it and scroll to their section themselves (smooth, stopping just below
+  //   the header) rather than following the #anchor, so the address bar never picks up #contact
+  //   and a refresh doesn't jump back there. Scroll is locked while the menu is open and Tab
+  //   stays inside it.
+  // - The header is hidden while the hero's own big name is on screen, appears once it has
+  //   scrolled away, and turns solid once the hero is behind it. Its &Liu scrolls back to the top.
   (function () {
     var menu = document.getElementById('site-menu');
-    var toggle = document.querySelector('.menu-toggle');
+    var toggles = [].slice.call(document.querySelectorAll('.menu-toggle'));
     var closeBtn = menu && menu.querySelector('.menu-close');
-    if (!menu || !toggle || !closeBtn) return;
-    var focusable = [closeBtn].concat([].slice.call(menu.querySelectorAll('a')));
+    var header = document.getElementById('site-header');
+    var hero = document.querySelector('.hero-viewport');
+    var heroName = hero && hero.querySelector('.amp');
+    if (!menu || !toggles.length || !closeBtn) return;
+    var links = [].slice.call(menu.querySelectorAll('a'));
+    var focusable = [closeBtn].concat(links);
+    var opener = toggles[0];
+
+    function behavior() {
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    }
 
     function setOpen(open, returnFocus) {
       menu.classList.toggle('is-open', open);
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggles.forEach(function (t) { t.setAttribute('aria-expanded', open ? 'true' : 'false'); });
       document.body.style.overflow = open ? 'hidden' : '';
       if (open) {
         void menu.offsetWidth; // apply visibility before focusing
         closeBtn.focus({ preventScroll: true });
       } else if (returnFocus) {
-        toggle.focus({ preventScroll: true });
+        opener.focus({ preventScroll: true });
       }
     }
 
-    toggle.addEventListener('click', function () { setOpen(true); });
+    toggles.forEach(function (t) {
+      t.addEventListener('click', function () { opener = t; setOpen(true); });
+    });
     closeBtn.addEventListener('click', function () { setOpen(false, true); });
-    // release the scroll lock before the browser follows the link, so the jump isn't blocked
-    focusable.slice(1).forEach(function (a) {
-      a.addEventListener('click', function () { setOpen(false, false); });
+    links.forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var id = (a.getAttribute('href') || '').replace('#', '');
+        var target = id && document.getElementById(id);
+        if (!target) return;    // nothing to scroll to: let the browser handle the link
+        e.preventDefault();     // keeps #about / #work / #contact out of the address bar
+        setOpen(false, false);  // also releases the scroll lock
+        requestAnimationFrame(function () {
+          var barH = header ? header.offsetHeight : 0;
+          window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - barH, behavior: behavior() });
+          target.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+        });
+      });
     });
     document.addEventListener('keydown', function (e) {
       if (!menu.classList.contains('is-open')) return;
@@ -725,6 +831,24 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
+
+    if (!header) return;
+    header.querySelector('.site-logo').addEventListener('click', function (e) {
+      e.preventDefault(); // back to the top without leaving #top in the address bar
+      window.scrollTo({ top: 0, behavior: behavior() });
+    });
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var barH = header.offsetHeight;
+      header.classList.toggle('is-on', !heroName || heroName.getBoundingClientRect().bottom < 6);
+      header.classList.toggle('is-solid', !hero || hero.getBoundingClientRect().bottom <= barH + 8);
+    }
+    function request() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    window.addEventListener('pageshow', request);
+    update();
   })();
 
   // Logo strip on touch screens: there's no hover there, so pressing a logo lights it up (full
