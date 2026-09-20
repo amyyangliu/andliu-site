@@ -187,6 +187,13 @@
     .banner       { animation: bannerSweep 4.95s 1.65s infinite; transform-origin: center; }
     .amp          { animation: ampSwap 4.95s 1.65s infinite; }
     .tagline      { animation: taglineFade 4.95s 1.65s infinite; }
+    /* The banner tagline sits on one line. Its & is the logo's own glyph (Marcellus), a small echo of the
+       wordmark. It deliberately doesn't use the .amp class: that one is tied to the wordmark's color
+       animation and to the header script, which looks up the first .amp inside the hero. */
+    .tagline-text { white-space: nowrap; font-size: clamp(30px, 4.4vw, 64px); }
+    /* one line has to fit the narrowest phones (360px) with room to spare, so shrink a little there */
+    @media (max-width: 480px) { .tagline-text { font-size: clamp(24px, 7.4vw, 30px); } }
+    .tag-amp { font-family: 'Marcellus', serif; }
     .hero-photo   { opacity: 0; animation: photoReveal 1s 1.65s 1 forwards; }
 
     /* Case-study media runs full-bleed: it cancels the section's side padding, while the
@@ -538,7 +545,7 @@
 
     <!-- big centered tagline, revealed only while the coral banner is open -->
     <div class="tagline" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;text-align:center;z-index:25;">
-      <div style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(30px,4.4vw,64px);line-height:1.25;letter-spacing:0.01em;color:var(--bg);">Branding<br>and web design</div>
+      <div class="tagline-text" style="font-family:'Bodoni Moda',serif;font-weight:500;line-height:1.25;letter-spacing:0.01em;color:var(--bg);">Branding <span class="tag-amp">&amp;</span> Web Design</div>
     </div>
 
     <!-- name, pinned on top of everything, stays put through every phase of the animation.
