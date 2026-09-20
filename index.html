@@ -289,8 +289,81 @@
     }
     .contact-status--error { color: var(--shutterPale); }
 
+    /* ------------------------------------------------------------------
+       SITE MENU
+       The hamburger opens a full-screen coral overlay (same coral and cream
+       serif as the hero's banner tagline) with the three section links.
+       Hidden with visibility, not display, so it can fade; visibility also
+       keeps its links out of the tab order while closed. The 44px+ tap
+       target on the toggle is built from padding, offset so the three lines
+       stay exactly where the old bare icon sat.
+       ------------------------------------------------------------------ */
+    .menu-toggle {
+      position: absolute;
+      top: calc(clamp(28px, 4.4vw, 56px) - 14px);
+      right: calc(clamp(24px, 4vw, 56px) - 14px);
+      z-index: 30;
+      padding: 14px;
+      background: none;
+      border: 0;
+      cursor: pointer;
+      line-height: 0;
+    }
+    .menu-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s ease, visibility 0s .35s;
+    }
+    .menu.is-open { opacity: 1; visibility: visible; transition: opacity .35s ease; }
+    .menu ul { list-style: none; margin: 0; padding: 0; text-align: center; }
+    .menu li {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .4s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
+    }
+    .menu.is-open li { opacity: 1; transform: none; }
+    .menu.is-open li:nth-child(1) { transition-delay: .08s; }
+    .menu.is-open li:nth-child(2) { transition-delay: .16s; }
+    .menu.is-open li:nth-child(3) { transition-delay: .24s; }
+    .menu a {
+      display: inline-block;
+      padding: 6px 12px;
+      font-family: 'Bodoni Moda', serif;
+      font-weight: 500;
+      font-size: clamp(44px, 8vw, 96px);
+      line-height: 1.15;
+      color: var(--bg);
+      transition: color .2s ease;
+    }
+    .menu a:hover { opacity: 1; color: var(--ink); }
+    .menu a:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
+    .menu-close {
+      position: absolute;
+      top: calc(clamp(28px, 4.4vw, 56px) - 14px);
+      right: calc(clamp(24px, 4vw, 56px) - 14px);
+      padding: 14px;
+      background: none;
+      border: 0;
+      color: var(--bg);
+      cursor: pointer;
+      line-height: 0;
+      transition: color .2s ease;
+    }
+    .menu-close:hover { color: var(--ink); }
+    .menu-close:focus-visible { outline: 2px solid var(--bg); outline-offset: 2px; }
+
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
+      .menu, .menu li { transition: none; }
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
       .logo-track img:hover { transform: none; }
       .tagline { opacity: 1; }
@@ -345,20 +418,20 @@
       <div style="font-weight:400;font-size:clamp(44px,5.6vw,80px);line-height:1;letter-spacing:0.03em;text-shadow:0 2px 24px rgba(0,0,0,0.25);display:flex;align-items:baseline;gap:6px;"><span class="amp" style="font-family:'Marcellus',serif;">&amp;</span><span style="font-family:'Italiana',serif;color:var(--bg);">Liu</span></div>
     </div>
 
-    <!-- hamburger, pinned top-right -->
-    <div style="position:absolute;top:clamp(28px,4.4vw,56px);right:clamp(24px,4vw,56px);z-index:30;">
+    <!-- hamburger, pinned top-right: opens the full-screen menu (see #site-menu below) -->
+    <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
       <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true">
         <rect width="26" height="2" style="fill:var(--ink)"></rect>
         <rect y="8" width="26" height="2" style="fill:var(--ink)"></rect>
         <rect y="16" width="26" height="2" style="fill:var(--ink)"></rect>
       </svg>
-    </div>
+    </button>
 
   </div>
 
   <!-- ================= ABOUT =================
        The coral rule is a flourish above the headline. -->
-  <div style="width:100%;padding:clamp(64px,9vw,120px) 0;background:var(--bg);">
+  <div id="about" style="width:100%;padding:clamp(64px,9vw,120px) 0;background:var(--bg);">
 
     <div style="max-width:760px;margin:0 auto;padding:0 clamp(24px,4vw,56px);text-align:center;">
       <div style="width:48px;height:3px;background:var(--accent);margin:0 auto 28px;"></div>
@@ -491,6 +564,20 @@
 
 </div>
 
+<!-- full-screen menu, opened by the hamburger in the hero -->
+<nav id="site-menu" class="menu" aria-label="Main menu">
+  <button type="button" class="menu-close" aria-label="Close menu">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M2 2L24 24M24 2L2 24" stroke="currentColor" stroke-width="2"></path>
+    </svg>
+  </button>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
 <div class="cursor-dot" aria-hidden="true"></div>
 
 <script>
@@ -556,6 +643,44 @@
           say('Something went wrong sending that. Please try again in a moment.', true);
         })
         .then(function () { button.disabled = false; });
+    });
+  })();
+
+  // Site menu: the hamburger opens it; the links jump to their sections (the smooth scrolling
+  // comes from the html rule). Closes on the X, on Escape, or on any link. Page scroll is
+  // locked while it's open, and Tab is kept inside it.
+  (function () {
+    var menu = document.getElementById('site-menu');
+    var toggle = document.querySelector('.menu-toggle');
+    var closeBtn = menu && menu.querySelector('.menu-close');
+    if (!menu || !toggle || !closeBtn) return;
+    var focusable = [closeBtn].concat([].slice.call(menu.querySelectorAll('a')));
+
+    function setOpen(open, returnFocus) {
+      menu.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) {
+        void menu.offsetWidth; // apply visibility before focusing
+        closeBtn.focus({ preventScroll: true });
+      } else if (returnFocus) {
+        toggle.focus({ preventScroll: true });
+      }
+    }
+
+    toggle.addEventListener('click', function () { setOpen(true); });
+    closeBtn.addEventListener('click', function () { setOpen(false, true); });
+    // release the scroll lock before the browser follows the link, so the jump isn't blocked
+    focusable.slice(1).forEach(function (a) {
+      a.addEventListener('click', function () { setOpen(false, false); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!menu.classList.contains('is-open')) return;
+      if (e.key === 'Escape') { setOpen(false, true); return; }
+      if (e.key !== 'Tab') return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
   })();
 
