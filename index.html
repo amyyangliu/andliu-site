@@ -283,22 +283,6 @@
     }
     .contact-status--error { color: var(--shutterPale); }
 
-    /* send button and the "or email" alternative sit on one row, wrapping on narrow screens.
-       The text is dimmed with rgba (not opacity) so the yellow link stays at full strength. */
-    .contact-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 20px 28px; }
-    .contact-alt {
-      font-family: 'Archivo', sans-serif;
-      font-size: 16px;
-      color: rgba(251, 238, 230, 0.72);
-    }
-    .contact-alt a {
-      color: var(--shutterPale);
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 4px;
-    }
-    .contact-alt a:focus-visible { outline: 2px solid var(--shutterPale); outline-offset: 3px; }
-
     /* respect users who ask for less motion */
     @media (prefers-reduced-motion: reduce) {
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
@@ -484,10 +468,7 @@
         <label class="contact-field"><span>About your project</span><textarea name="message" rows="5" required></textarea></label>
         <!-- honeypot: real visitors never see or fill this; bots do -->
         <label class="contact-hp" aria-hidden="true">Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
-        <div class="contact-actions">
-          <button type="submit" class="contact-submit">Send message</button>
-          <span class="contact-alt">Or email me directly at <a href="mailto:hello@andliustudio.com">hello@andliustudio.com</a></span>
-        </div>
+        <button type="submit" class="contact-submit">Send message</button>
         <div class="contact-status" role="status" aria-live="polite"></div>
       </form>
 
