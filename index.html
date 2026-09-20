@@ -224,11 +224,13 @@
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
     }
-    /* Safari-safe on purpose. On iPhone, a mask-image on an overflow:hidden parent, plus an SVG
-       url() filter on the images, plus a moving track made chunks of the logos vanish as they
-       scrolled back into view. So: the edge fades are two overlays in the band's own yellow (not
-       a mask), the grey tint is plain CSS filter functions (not an SVG filter), and the track is
-       a stable composited layer. */
+    /* Safari-safe on purpose. iPhone Safari kept leaving parts of this strip unpainted while it
+       scrolled: half a logo, or a whole blank stretch with a hard vertical edge. So everything it
+       struggles with is gone from the moving strip: no mask (the edge fades are two yellow
+       overlays), no filter and no opacity on the moving pieces (each logo is a pre-made grey copy
+       with its colour original stacked on top, and hover/tap just crossfades them), no will-change
+       on the wide track, and on touch screens a small script moves the track instead of a CSS
+       animation (see the script). */
     .logo-marquee {
       position: relative;
       width: 100%;
@@ -249,43 +251,61 @@
     .logo-marquee::before { left: 0;  background: linear-gradient(90deg,  var(--shutterPale), rgba(255, 194, 0, 0)); }
     .logo-marquee::after  { right: 0; background: linear-gradient(270deg, var(--shutterPale), rgba(255, 194, 0, 0)); }
     .logo-track {
+      --logo-gap: clamp(56px, 7vw, 96px);
       display: flex;
       align-items: center;
       width: max-content;
-      gap: clamp(56px, 7vw, 96px);
+      gap: var(--logo-gap);
+      padding-right: var(--logo-gap); /* makes 50% of the width exactly one set of logos plus its gap, so the loop has no jump */
       animation: logoScroll 34s linear infinite;
-      will-change: transform;
     }
-    .logo-track img {
+    .logo-track.is-driven { animation: none; } /* touch screens: the script moves it */
+    .logo-item {
+      position: relative;
       flex: none;
-      max-width: none;
+      display: block;
       height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
+      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .logo-item img {
+      display: block;
+      height: 100%;
       width: auto;
-      filter: brightness(0) invert(0.27); /* any logo -> flat warm-neutral dark grey */
-      opacity: 0.75;
-      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
+      max-width: none;
+    }
+    .logo-item .logo-grey  { transition: opacity .25s ease; }
+    .logo-item .logo-color {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      transition: opacity .25s ease;
     }
     /* Optical balance. With one shared height, wide wordmarks (Samsung) read far bigger than compact
        marks (H&M, Under Armour, FrieslandCampina). Each logo's height is multiplied by a scale so
        their visible size (geometric mean of ink width x height) lands in the same range. It's a
-       uniform scale of the height with width:auto, so every logo keeps its proportions, and it only
-       changes height, so none of the Safari-safe rules above are touched. */
-    .logo-track img[src$="hm.svg"]              { --logo-scale: 1.45; }
-    .logo-track img[src$="samsung.svg"]         { --logo-scale: 0.88; }
-    .logo-track img[src$="underarmour.svg"]     { --logo-scale: 1.5; }
-    .logo-track img[src$="frieslandcampina.png"]{ --logo-scale: 1.35; }
+       uniform scale of the height with width:auto, so every logo keeps its proportions. */
+    .logo-item[data-logo="hm"]               { --logo-scale: 1.45; }
+    .logo-item[data-logo="samsung"]          { --logo-scale: 0.88; }
+    .logo-item[data-logo="underarmour"]      { --logo-scale: 1.5; }
+    .logo-item[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
     /* The light-up has two triggers that do the same thing. Mouse devices use :hover. Touch
        screens have no hover (iOS fakes it by leaving :hover stuck on whatever was touched last,
        which is unreliable), so a script toggles .is-lit / .is-held while a finger is on a logo
        instead. Hover rules are limited to hover-capable devices so the two never fight. */
     @media (hover: hover) {
       .logo-track:hover { animation-play-state: paused; }
-      .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
+      .logo-item:hover { transform: scale(1.35); }
+      .logo-item:hover .logo-color { opacity: 1; }
+      .logo-item:hover .logo-grey  { opacity: 0; }
     }
     .logo-track.is-held { animation-play-state: paused; }
-    .logo-track img.is-lit { filter: none; opacity: 1; transform: scale(1.35); }
+    .logo-item.is-lit { transform: scale(1.35); }
+    .logo-item.is-lit .logo-color { opacity: 1; }
+    .logo-item.is-lit .logo-grey  { opacity: 0; }
     /* pressing a logo shouldn't flash a tap highlight or pop iOS's Save Image / drag menu */
-    .logo-track img {
+    .logo-item, .logo-item img {
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
@@ -497,7 +517,7 @@
       .site-header, .site-header .menu-toggle { transition: none; }
       .menu, .menu li { transition: none; }
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
-      .logo-track img:hover, .logo-track img.is-lit { transform: none; }
+      .logo-item:hover, .logo-item.is-lit { transform: none; }
       .tagline { opacity: 1; }
       .banner  { transform: scaleX(1); }
       .amp     { color: var(--bg); }
@@ -590,22 +610,22 @@
 
     <div class="logo-marquee">
       <div class="logo-track">
-        <img src="images/logos/hm.svg" alt="H&amp;M">
-        <img src="images/logos/unilever.svg" alt="Unilever">
-        <img src="images/logos/heineken.svg" alt="Heineken">
-        <img src="images/logos/samsung.svg" alt="Samsung">
-        <img src="images/logos/amgen.svg" alt="Amgen">
-        <img src="images/logos/shiseido.svg" alt="Shiseido">
-        <img src="images/logos/underarmour.svg" alt="Under Armour">
-        <img src="images/logos/frieslandcampina.png" alt="FrieslandCampina">
-        <img src="images/logos/hm.svg" alt="" aria-hidden="true">
-        <img src="images/logos/unilever.svg" alt="" aria-hidden="true">
-        <img src="images/logos/heineken.svg" alt="" aria-hidden="true">
-        <img src="images/logos/samsung.svg" alt="" aria-hidden="true">
-        <img src="images/logos/amgen.svg" alt="" aria-hidden="true">
-        <img src="images/logos/shiseido.svg" alt="" aria-hidden="true">
-        <img src="images/logos/underarmour.svg" alt="" aria-hidden="true">
-        <img src="images/logos/frieslandcampina.png" alt="" aria-hidden="true">
+        <span class="logo-item" data-logo="hm"><img class="logo-grey" src="images/logos/grey/hm.png" alt="H&amp;M"><img class="logo-color" src="images/logos/hm.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="unilever"><img class="logo-grey" src="images/logos/grey/unilever.png" alt="Unilever"><img class="logo-color" src="images/logos/unilever.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="heineken"><img class="logo-grey" src="images/logos/grey/heineken.png" alt="Heineken"><img class="logo-color" src="images/logos/heineken.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="samsung"><img class="logo-grey" src="images/logos/grey/samsung.png" alt="Samsung"><img class="logo-color" src="images/logos/samsung.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="amgen"><img class="logo-grey" src="images/logos/grey/amgen.png" alt="Amgen"><img class="logo-color" src="images/logos/amgen.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="shiseido"><img class="logo-grey" src="images/logos/grey/shiseido.png" alt="Shiseido"><img class="logo-color" src="images/logos/shiseido.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="underarmour"><img class="logo-grey" src="images/logos/grey/underarmour.png" alt="Under Armour"><img class="logo-color" src="images/logos/underarmour.svg" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="frieslandcampina"><img class="logo-grey" src="images/logos/grey/frieslandcampina.png" alt="FrieslandCampina"><img class="logo-color" src="images/logos/frieslandcampina.png" alt="" aria-hidden="true"></span>
+        <span class="logo-item" data-logo="hm" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/hm.png" alt=""><img class="logo-color" src="images/logos/hm.svg" alt=""></span>
+        <span class="logo-item" data-logo="unilever" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/unilever.png" alt=""><img class="logo-color" src="images/logos/unilever.svg" alt=""></span>
+        <span class="logo-item" data-logo="heineken" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/heineken.png" alt=""><img class="logo-color" src="images/logos/heineken.svg" alt=""></span>
+        <span class="logo-item" data-logo="samsung" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/samsung.png" alt=""><img class="logo-color" src="images/logos/samsung.svg" alt=""></span>
+        <span class="logo-item" data-logo="amgen" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/amgen.png" alt=""><img class="logo-color" src="images/logos/amgen.svg" alt=""></span>
+        <span class="logo-item" data-logo="shiseido" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/shiseido.png" alt=""><img class="logo-color" src="images/logos/shiseido.svg" alt=""></span>
+        <span class="logo-item" data-logo="underarmour" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/underarmour.png" alt=""><img class="logo-color" src="images/logos/underarmour.svg" alt=""></span>
+        <span class="logo-item" data-logo="frieslandcampina" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/frieslandcampina.png" alt=""><img class="logo-color" src="images/logos/frieslandcampina.png" alt=""></span>
       </div>
     </div>
 
@@ -885,11 +905,11 @@
     function letGo() { release(); clearTimeout(timer); timer = setTimeout(unlight, 1200); }
 
     track.addEventListener('touchstart', function (e) {
-      var img = e.target.closest ? e.target.closest('img') : null;
-      if (!img) return;
+      var item = e.target.closest ? e.target.closest('.logo-item') : null;
+      if (!item) return;
       unlight();
-      lit = img;
-      img.classList.add('is-lit');
+      lit = item;
+      item.classList.add('is-lit');
       track.classList.add('is-held');
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
@@ -904,6 +924,43 @@
     document.addEventListener('touchstart', function (e) {
       if (!e.target.closest || !e.target.closest('.logo-track')) cancel();
     }, { passive: true });
+  })();
+
+  // Logo strip motion on touch screens. iPhone Safari kept leaving stretches of the strip unpainted
+  // while a CSS animation moved it, so here a small script moves it instead, at the same pace (one
+  // full set of logos every 34s). It only runs while the strip is on screen and the tab is visible,
+  // and it holds still while a finger is on a logo (.is-held, set by the script above).
+  (function () {
+    var track = document.querySelector('.logo-track');
+    if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var SECONDS = 34, period = 0, pos = 0, last = 0, raf = 0, onScreen = true, tabVisible = !document.hidden;
+
+    function measure() { period = track.scrollWidth / 2; } // two identical sets, padded so half is exactly one set
+    function frame(t) {
+      raf = requestAnimationFrame(frame);
+      var dt = last ? Math.min(t - last, 64) / 1000 : 0;
+      last = t;
+      if (!period || track.classList.contains('is-held')) return;
+      pos = (pos + period / SECONDS * dt) % period;
+      track.style.transform = 'translate3d(' + (-pos).toFixed(2) + 'px,0,0)';
+    }
+    function sync() {
+      cancelAnimationFrame(raf);
+      last = 0;
+      if (onScreen && tabVisible) raf = requestAnimationFrame(frame);
+    }
+
+    track.classList.add('is-driven');
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    [].forEach.call(track.querySelectorAll('img'), function (img) { img.addEventListener('load', measure); });
+    document.addEventListener('visibilitychange', function () { tabVisible = !document.hidden; sync(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) { onScreen = entries[0].isIntersecting; sync(); }).observe(track.parentNode);
+    }
+    sync();
   })();
 
   // Trailing cursor dot: eases toward the real pointer position every frame (the "lag"),
