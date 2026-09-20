@@ -34,6 +34,10 @@
          on a phone is only ~165px tall, which buries the actual work —
          so the crop gets taller as the screen gets narrower. */
       --case-ratio: 21/9;
+
+      /* Horizontal page gutter. The Selected Work section pads itself by this, and the
+         case-study media breaks back out of it by the same amount to run edge to edge. */
+      --gutter: clamp(24px, 4vw, 56px);
     }
     @media (max-width: 900px) { :root { --case-ratio: 16/9; } }
     @media (max-width: 600px) { :root { --case-ratio: 4/3;  } }
@@ -164,6 +168,16 @@
     .amp          { animation: ampSwap 4.95s 1.65s infinite; }
     .tagline      { animation: taglineFade 4.95s 1.65s infinite; }
     .hero-photo   { opacity: 0; animation: photoReveal 1s 1.65s 1 forwards; }
+
+    /* Case-study media runs full-bleed: it cancels the section's side padding, while the
+       titles and descriptions above and below stay on the gutter. Capped at 82vh so on very
+       wide screens the crop can't grow taller than the window. */
+    .case-media {
+      position: relative;
+      width: calc(100% + 2 * var(--gutter));
+      margin-left: calc(-1 * var(--gutter));
+      max-height: 82vh;
+    }
 
     /* ------------------------------------------------------------------
        CLIENT LOGO MARQUEE
@@ -316,7 +330,7 @@
   </div>
 
   <!-- ================= SELECTED WORK ================= -->
-  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) clamp(24px,4vw,56px) clamp(72px,8.5vw,112px);background:#FFFFFF;">
+  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) var(--gutter) clamp(72px,8.5vw,112px);background:#FFFFFF;">
 
     <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">Selected Work</div>
 
@@ -328,10 +342,10 @@
 
     <!-- video preview: real project reel, muted so autoplay is allowed by browsers;
          starts playing once scrolled into view and pauses once scrolled away (see script). -->
-    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
+    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
       <video class="scroll-autoplay-video" src="images/smartthings-reel.mp4" poster="images/smartthings-video-still.jpg" muted loop playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
       <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
-      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Project reel</div>
+      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Project reel</div>
     </div>
 
     <!-- case study 2: Okie Media -->
@@ -340,7 +354,7 @@
       <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Brand identity &amp; website — video production studio</div>
     </div>
 
-    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
+    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
       <img src="images/okie-media-site-still.jpg" alt="Okie Media website homepage with full-bleed video hero" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
@@ -348,7 +362,7 @@
           <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
         </div>
       </div>
-      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
+      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
     </div>
 
     <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
@@ -361,7 +375,7 @@
       <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Rebrand &amp; web design — Swedish cross-country ski brand</div>
     </div>
 
-    <div style="position:relative;width:100%;aspect-ratio:var(--case-ratio);background:var(--ink);overflow:hidden;">
+    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--ink);overflow:hidden;">
       <img src="images/wease-site-still.jpg" alt="WEASE website product page showing the Superbia jacket" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
@@ -369,7 +383,7 @@
           <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
         </div>
       </div>
-      <div style="position:absolute;left:28px;bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
+      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
     </div>
 
     <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
