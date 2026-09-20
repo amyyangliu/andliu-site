@@ -235,7 +235,6 @@
       animation: logoScroll 34s linear infinite;
       will-change: transform;
     }
-    .logo-track:hover { animation-play-state: paused; }
     .logo-track img {
       flex: none;
       max-width: none;
@@ -245,7 +244,17 @@
       opacity: 0.75;
       transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, filter .25s ease;
     }
-    .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
+    /* The light-up has two triggers that do the same thing. Mouse devices use :hover. Touch
+       screens have no hover (iOS fakes it by leaving :hover stuck on whatever was tapped last,
+       which is unreliable), so a script toggles .is-lit / .is-held on tap instead. Hover rules
+       are limited to hover-capable devices so the two never fight. */
+    @media (hover: hover) {
+      .logo-track:hover { animation-play-state: paused; }
+      .logo-track img:hover { filter: none; opacity: 1; transform: scale(1.35); }
+    }
+    .logo-track.is-held { animation-play-state: paused; }
+    .logo-track img.is-lit { filter: none; opacity: 1; transform: scale(1.35); }
+    @media (hover: none) { .logo-track img { cursor: pointer; } } /* makes iOS treat taps on them as clicks */
 
     /* ------------------------------------------------------------------
        CONTACT FORM
@@ -385,7 +394,7 @@
     @media (prefers-reduced-motion: reduce) {
       .menu, .menu li { transition: none; }
       .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
-      .logo-track img:hover { transform: none; }
+      .logo-track img:hover, .logo-track img.is-lit { transform: none; }
       .tagline { opacity: 1; }
       .banner  { transform: scaleX(1); }
       .amp     { color: var(--bg); }
@@ -692,6 +701,39 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
+  })();
+
+  // Logo strip on touch screens: there's no hover there, so a tap lights a logo up (full color,
+  // bubble, strip paused) the way hover does on a computer. Tap it again, tap anywhere else, or
+  // wait a few seconds and it settles back to grey. The click listener sits on the strip itself
+  // (iOS ignores taps that only bubble up to document), and the outside-tap listener uses
+  // touchstart, which fires everywhere.
+  (function () {
+    var track = document.querySelector('.logo-track');
+    if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
+    var lit = null, timer = null;
+
+    function settle() {
+      clearTimeout(timer);
+      if (lit) lit.classList.remove('is-lit');
+      track.classList.remove('is-held');
+      lit = null;
+    }
+
+    track.addEventListener('click', function (e) {
+      var img = e.target.closest ? e.target.closest('img') : null;
+      if (!img) return;
+      var wasLit = img === lit;
+      settle();
+      if (wasLit) return;
+      lit = img;
+      img.classList.add('is-lit');
+      track.classList.add('is-held');
+      timer = setTimeout(settle, 4000);
+    });
+    document.addEventListener('touchstart', function (e) {
+      if (!e.target.closest || !e.target.closest('.logo-track')) settle();
+    }, { passive: true });
   })();
 
   // Trailing cursor dot: eases toward the real pointer position every frame (the "lag"),
