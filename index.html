@@ -120,13 +120,19 @@
       42.67% { transform: translateX(0%); }
       100%   { transform: translateX(0%); }
     }
+    /* Opacity is stepped to 0 whenever the banner is scaled down to nothing. Safari can paint
+       a hairline for a zero-width element (a 1px coral line down the center of the hero on
+       iPhone), so while closed it must not be painted at all. The steps are ~0.5ms wide, so
+       they read as instant and the sweep itself looks exactly as before. */
     @keyframes bannerSweep {
-      0%      { transform: scaleX(0); }
-      25.33%  { transform: scaleX(0); animation-timing-function: cubic-bezier(.22,1,.36,1); }
+      0%      { transform: scaleX(0); opacity: 0; }
+      25.32%  { opacity: 0; }
+      25.33%  { transform: scaleX(0); opacity: 1; animation-timing-function: cubic-bezier(.22,1,.36,1); }
       34.67%  { transform: scaleX(1); }
       81.33%  { transform: scaleX(1); animation-timing-function: ease-in; }
-      90.67%  { transform: scaleX(0); }
-      100%    { transform: scaleX(0); }
+      90.67%  { transform: scaleX(0); opacity: 1; }
+      90.68%  { opacity: 0; }
+      100%    { transform: scaleX(0); opacity: 0; }
     }
     @keyframes taglineFade {
       0%     { opacity: 0; }
@@ -320,7 +326,10 @@
 
     <!-- shutter panels: closed at center in a dark neutral + pale coral pair, bounce open to a
          sliver, hold, then get covered by the bold coral banner sweep -->
-    <div class="reveal-left" style="position:absolute;top:0;bottom:0;left:-8vw;width:calc(50% + 8vw);background:var(--heroShutter);z-index:10;"></div>
+    <!-- the left panel runs 2px past center, tucked under the right one, so the center seam is
+         always covered. Two panels meeting at exactly 50% leave a sub-pixel gap on phones whose
+         half-width isn't a whole device pixel, and the coral backdrop shows through as a line. -->
+    <div class="reveal-left" style="position:absolute;top:0;bottom:0;left:-8vw;width:calc(50% + 8vw + 2px);background:var(--heroShutter);z-index:10;"></div>
     <div class="reveal-right" style="position:absolute;top:0;bottom:0;right:-8vw;width:calc(50% + 8vw);background:var(--shutterPale);z-index:10;"></div>
 
     <!-- full-screen brand banner, opens outward from center to cover shutters + photo entirely -->
