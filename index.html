@@ -531,14 +531,10 @@
       <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Brand identity &amp; website — video production studio</div>
     </div>
 
+    <!-- muted autoplay walkthrough, same behavior as the reel above (see the script at the bottom) -->
     <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
-      <img src="images/okie-media-site-still.jpg" alt="Okie Media website homepage with full-bleed video hero" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-        <div style="width:84px;height:84px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 34px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;">
-          <svg width="15" height="18" viewBox="0 0 15 18" fill="none" style="margin-left:3px;"><path d="M14.6 9L0.4 17.2V0.8L14.6 9Z" style="fill:var(--bg)"></path></svg>
-        </div>
-      </div>
+      <video class="scroll-autoplay-video" src="images/okie-showcase.mp4" poster="images/okie-media-site-still.jpg" muted loop playsinline preload="metadata" aria-label="Scrolling walkthrough of the Okie Media website" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
       <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
     </div>
 
