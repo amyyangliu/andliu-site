@@ -196,6 +196,14 @@
     .tag-amp { font-family: 'Marcellus', serif; }
     .hero-photo   { opacity: 0; animation: photoReveal 1s 1.65s 1 forwards; }
 
+    /* Hold the hero on its orange service slide while the new intro is developed. */
+    .hero-viewport .reveal-left,
+    .hero-viewport .reveal-right,
+    .hero-viewport .hero-photo { animation: none; visibility: hidden; }
+    .hero-viewport .banner { animation: none; transform: scaleX(1); opacity: 1; }
+    .hero-viewport .tagline { animation: none; opacity: 1; }
+    .amp { animation: none; color: var(--bg); }
+
     /* Case-study media runs full-bleed: it cancels the section's side padding, while the
        titles and descriptions above and below stay on the gutter. Capped at 82vh so on very
        wide screens the crop can't grow taller than the window. */
