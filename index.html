@@ -238,36 +238,14 @@
     .footer { display: flex; justify-content: space-between; padding: 30px var(--gutter); background: var(--dark); color: #c4b7ac; font-size: 11px; }
     @media (max-width: 600px) { .footer { padding: 25px 16px; font-size: 10px; } }
 
-    /* ------------------------------------------------------------------
-       INTRO
-       Confined to the topline+masthead+details+statement block only (NOT
-       the whole page, NOT scroll-locked -- everything below is normal,
-       reachable, scrollable DOM flow the entire time it plays, same as
-       remotemountain.com's own intro). & fades in, dissolves into a traced
-       rectangle, the rectangle fills solid white and grows to exactly
-       cover this block, then the whole thing fades to reveal the real
-       page, which has been sitting underneath, already laid out, the
-       whole time.
-       ------------------------------------------------------------------ */
-    .hero-wrap { position: relative; }
-    .intro { position: absolute; inset: 0; z-index: 55; background: #000; opacity: 1; transition: opacity .5s ease; }
-    .intro.is-done { display: none; }
-    .intro.is-fading { opacity: 0; }
-    .intro-stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; }
-    .intro-amp {
-      font-family: 'Marcellus', serif; color: #fff; font-size: clamp(120px, 22vw, 320px); line-height: 1;
-      opacity: 0; transform: scale(0.92); transition: opacity .45s ease, transform .45s ease;
-    }
-    .intro-amp.is-in { opacity: 1; transform: scale(1); }
-    .intro-amp.is-out { opacity: 0; transition: opacity .3s ease; }
-    .intro-trace { position: absolute; overflow: visible; }
-    .intro-trace rect { fill: none; stroke: #fff; stroke-width: 3; }
-    .intro-box { position: absolute; background: #fff; }
-    @media (prefers-reduced-motion: reduce) {
-      .intro { transition: none; }
-      .intro-amp { transition: none; }
-    }
+    /* Viewport entrance; scrolling remains available throughout. */
+#entrance{position:absolute;left:0;top:0;width:100%;height:100svh;background:#000;z-index:200;pointer-events:none;overflow:hidden}
+#entrance[hidden]{display:none}
+#entrance-mark{position:absolute;inset:0;display:grid;place-items:center;font-family:Marcellus,serif;font-size:clamp(100px,14vw,190px);color:#fff;opacity:0;line-height:1}
+#entrance-outline{position:absolute;left:50%;top:50%;width:150px;height:180px;transform:translate(-50%,-50%);overflow:visible}#entrance-outline rect{fill:none;stroke:#fff;stroke-width:1.25;stroke-dasharray:1000;stroke-dashoffset:1000}
+#entrance-white{position:absolute;inset:0;background:white;clip-path:inset(49.9% 49.9%)}
 
+@media(prefers-reduced-motion:reduce){#entrance{display:none}}
     @media (prefers-reduced-motion: reduce) {
       .menu, .menu li { transition: none; }
       .logo-item:hover, .logo-item.is-lit { transform: none; }
@@ -291,13 +269,6 @@
   <div class="details mono"><div>A Los Angeles&ndash;based digital design studio.</div></div>
   <p class="statement">Thoughtful websites and distinctive brands.<br>Built around <em>your business.</em></p>
 
-  <!-- intro overlay: scoped to this block only via the position:relative wrapper above --
-       nothing below the statement is affected, and page scroll is never locked -->
-  <div class="intro" id="intro">
-    <div class="intro-amp" id="introAmp">&amp;</div>
-    <svg class="intro-trace" id="introTrace"><rect id="traceRect" x="0" y="0" width="0" height="0"></rect></svg>
-    <div class="intro-box" id="introBox" style="display:none;"></div>
-  </div>
 </div>
 
 <main>
@@ -572,66 +543,6 @@
     sync();
   })();
 
-  // Intro: & fades in, dissolves into a traced rectangle that fills solid white and grows to
-  // exactly cover the hero-wrap block above (not the whole page), then fades away. No scroll
-  // lock anywhere in this -- the rest of the page is reachable and scrollable the entire time,
-  // matching how remotemountain.com's own intro behaves.
-  (function () {
-    var intro = document.getElementById('intro');
-    var heroWrap = document.getElementById('heroWrap');
-    var amp = document.getElementById('introAmp');
-    var traceSvg = document.getElementById('introTrace');
-    var traceRect = document.getElementById('traceRect');
-    var box = document.getElementById('introBox');
-    if (!intro || !heroWrap || !amp || !traceSvg || !traceRect || !box) return;
-    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-
-    async function run() {
-      if (reduced) { intro.classList.add('is-done'); return; }
-      await wait(200);
-      amp.classList.add('is-in');
-      await wait(600);
-
-      var ar = amp.getBoundingClientRect(), hr = intro.getBoundingClientRect();
-      var pad = ar.height * 0.18;
-      var bx = ar.left - hr.left - pad, by = ar.top - hr.top - pad;
-      var bw = ar.width + pad * 2, bh = ar.height + pad * 2;
-
-      traceSvg.style.left = bx + 'px'; traceSvg.style.top = by + 'px';
-      traceSvg.style.width = bw + 'px'; traceSvg.style.height = bh + 'px';
-      traceRect.setAttribute('width', bw); traceRect.setAttribute('height', bh);
-
-      amp.classList.add('is-out');
-      var len = traceRect.getTotalLength();
-      traceRect.style.strokeDasharray = len;
-      traceRect.style.strokeDashoffset = len;
-      traceRect.getBoundingClientRect();
-      traceRect.style.transition = 'stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)';
-      traceRect.style.strokeDashoffset = '0';
-      await wait(550);
-
-      traceSvg.style.display = 'none';
-      box.style.left = bx + 'px'; box.style.top = by + 'px';
-      box.style.width = bw + 'px'; box.style.height = bh + 'px';
-      box.style.display = 'block';
-      await wait(50);
-
-      box.style.transition = 'left .7s cubic-bezier(.22,1,.36,1), top .7s cubic-bezier(.22,1,.36,1), width .7s cubic-bezier(.22,1,.36,1), height .7s cubic-bezier(.22,1,.36,1)';
-      box.style.left = '0px'; box.style.top = '0px';
-      box.style.width = hr.width + 'px'; box.style.height = hr.height + 'px';
-      await wait(750);
-
-      intro.classList.add('is-fading');
-      await wait(550);
-      intro.classList.add('is-done');
-    }
-
-    if (document.readyState === 'complete') run();
-    else window.addEventListener('load', run);
-  })();
-
   // Trailing cursor dot: unchanged from before.
   (function () {
     var dot = document.querySelector('.cursor-dot');
@@ -670,5 +581,42 @@
   })();
 </script>
 
+<div id="entrance" hidden aria-hidden="true"><div id="entrance-white"></div><svg id="entrance-outline" viewBox="0 0 150 180"><rect x="1" y="1" width="148" height="178" pathLength="1000"/></svg><div id="entrance-mark">&amp;</div></div>
+<script>
+(()=>{
+const cover=document.getElementById('entrance'),mark=document.getElementById('entrance-mark'),white=document.getElementById('entrance-white');
+const outline=document.querySelector('#entrance-outline'),line=outline.querySelector('rect');
+
+const targets=['.topline','.masthead .wordmark','.masthead .slogan','.details','.statement','#work .project:first-child .project-head','#work .project:first-child .video-wrap'].map(s=>document.querySelector(s)).filter(Boolean);
+let running=false;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+async function play(speed=1){
+ if(running)return; running=true;
+
+ if(reduced.matches){running=false;;return}
+ const animations=[];let failSafe;
+ const anim=(el,frames,timing)=>{let a=el.animate(frames,{...timing,duration:timing.duration*speed,delay:(timing.delay||0)*speed,fill:timing.fill||'both'});animations.push(a);return a};
+ try{
+ cover.hidden=false;
+ failSafe=setTimeout(()=>{cover.hidden=true;animations.forEach(a=>a.cancel())},6500*speed);
+ await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,250))]);
+ anim(mark,[{opacity:0},{opacity:1}],{duration:1400,delay:150,easing:'cubic-bezier(.4,0,.2,1)'});
+ anim(mark,[{opacity:1},{opacity:0}],{duration:300,delay:1800,easing:'ease-in',fill:'forwards'});
+ anim(line,[{strokeDashoffset:1000},{strokeDashoffset:0}],{duration:550,delay:1850,easing:'cubic-bezier(.4,0,.2,1)'});
+ const aperture='inset(calc(50% - 90px) calc(50% - 75px))';
+ anim(white,[{opacity:0},{opacity:1}],{duration:180,delay:2380,easing:'ease-out'});
+ anim(white,[{clipPath:aperture},{clipPath:'inset(0% 0%)'}],{duration:950,delay:2500,easing:'cubic-bezier(.76,0,.24,1)'});
+ anim(outline,[{opacity:1},{opacity:0}],{duration:150,delay:2500,easing:'ease-out'});
+ anim(cover,[{opacity:1},{opacity:0}],{duration:400,delay:3350,easing:'ease-out'});
+ const fades=targets.map((el,i)=>anim(el,[{opacity:0,transform:'translateY(26px)'},{opacity:1,transform:'translateY(0)'}],{duration:850,delay:3350+i*75,easing:'cubic-bezier(.16,1,.3,1)'}));
+ await Promise.all(fades.map(a=>a.finished));
+ }catch(e){/* Always expose the page if an animation is interrupted. */}
+ finally{clearTimeout(failSafe);cover.hidden=true;animations.forEach(a=>a.cancel());running=false;}
+}
+// Run once per tab session; direct section links remain immediately accessible.
+let seen=false;
+try{seen=sessionStorage.getItem('andliu-entrance-v2')==='seen';sessionStorage.setItem('andliu-entrance-v2','seen')}catch(e){}
+if(!seen&&!location.hash)play();
+})();
+</script>
 </body>
 </html>
