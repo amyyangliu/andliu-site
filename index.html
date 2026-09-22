@@ -4,304 +4,193 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>&amp;Liu — Branding and web design</title>
-  <meta name="description" content="Agency-caliber branding and web design for startups and independent businesses. Founded by Amy Liu, with agency experience on brands like Samsung and Unilever.">
+  <title>&amp;Liu — Web design &amp; branding</title>
+  <meta name="description" content="Web design and branding for businesses moving forward. Agency-caliber work from a Los Angeles-based studio, without the agency.">
 
   <!-- social sharing -->
-  <meta property="og:title" content="&amp;Liu — Branding and web design">
-  <meta property="og:description" content="Agency-caliber work. Without the agency.">
+  <meta property="og:title" content="&amp;Liu — Web design &amp; branding">
+  <meta property="og:description" content="Agency caliber work. Without the agency.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="&amp;Liu Studio">
   <meta property="og:url" content="https://andliustudio.com/">
-  <!-- link-preview apps need a full https address here, not a relative path. 1200x630 is the
-       shape they show without cropping. -->
   <meta property="og:image" content="https://andliustudio.com/images/og-preview.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="SmartThings website design shown on a laptop and phone: work by &amp;Liu Studio">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="&amp;Liu — Branding and web design">
-  <meta name="twitter:description" content="Agency-caliber work. Without the agency.">
+  <meta name="twitter:title" content="&amp;Liu — Web design &amp; branding">
+  <meta name="twitter:description" content="Agency caliber work. Without the agency.">
   <meta name="twitter:image" content="https://andliustudio.com/images/og-preview.jpg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;1,500&family=Italiana&family=Marcellus&family=Archivo:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Marcellus&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
 
   <style>
     /* ------------------------------------------------------------------
-       PALETTE — "Coral Pop". Change these four values to retheme the
-       entire site; every color below is derived from them.
+       PALETTE. White/near-black/coral, replacing the old cream+yellow
+       shutter scheme (that scheme's own hero is retired). --dark and
+       --cream are kept specifically for the contact band, which stays
+       the same dark warm brown with cream text it always was.
        ------------------------------------------------------------------ */
     :root {
-      --bg:          #FBEEE6;  /* pale warm cream — page background */
-      --ink:         #000000;  /* true black — body text, cursor, trusted-by band */
-      --accent:      #E2542B;  /* coral — banner, labels, about block  */
-      --shutterPale: #FFC200;  /* golden yellow — right shutter, matched to suzannajackson.com's hero */
-      --heroShutter: #241E1A;  /* dark warm grey — left shutter panel only, kept apart from --ink */
+      --bg:     #FFFFFF;  /* page background */
+      --ink:    #242424;  /* body text, wordmark */
+      --accent: #E2542B;  /* coral -- the one accent color */
+      --dark:   #241E1A;  /* contact band + footer + full-screen menu (unchanged from before) */
+      --cream:  #FBEEE6;  /* text on the dark band (unchanged from before) */
 
-      /* Case-study image crop. Cinematic on desktop, but a 21:9 letterbox
-         on a phone is only ~165px tall, which buries the actual work —
-         so the crop gets taller as the screen gets narrower. */
       --case-ratio: 21/9;
-
-      /* Horizontal page gutter. The Selected Work section pads itself by this, and the
-         case-study media breaks back out of it by the same amount to run edge to edge. */
       --gutter: clamp(24px, 4vw, 56px);
-
-      /* Height of the fixed compact header. Section jumps stop this far below the top so the
-         header never covers a section's heading. */
-      --header-h: clamp(56px, 6vw, 68px);
     }
     @media (max-width: 900px) { :root { --case-ratio: 16/9; } }
     @media (max-width: 600px) { :root { --case-ratio: 4/3;  } }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+    /* clears the sticky topline on any #anchor jump (just "Let's talk" -> #contact, no menu) */
+    html { scroll-behavior: smooth; scroll-padding-top: clamp(90px, 15vw, 130px); }
     body {
       margin: 0;
       background: var(--bg);
+      color: var(--ink);
       font-family: 'Archivo', sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
     img { max-width: 100%; display: block; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { opacity: 0.7; }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 5px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .mono { font-family: 'Space Mono', ui-monospace, monospace; letter-spacing: 0.025em; text-transform: uppercase; }
 
     /* ------------------------------------------------------------------
-       TRAILING CURSOR DOT
-       The native pointer stays untouched (arrow by default, hand over
-       links/buttons); this dot just trails behind it with easing, same
-       idea as yourmajesty.co's follower — a plain DOM element updated
-       on requestAnimationFrame, no cursor-image swap involved.
+       TRAILING CURSOR DOT (unchanged from before)
        ------------------------------------------------------------------ */
     .cursor-dot {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--ink);
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0;
+      position: fixed; top: 0; left: 0; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--ink); pointer-events: none; z-index: 9999; opacity: 0;
       transform: translate(-50%, -50%);
       transition: width .25s ease, height .25s ease, opacity .25s ease;
     }
     .cursor-dot--hover { width: 44px; height: 44px; }
-    @media (hover: none), (pointer: coarse) {
-      .cursor-dot { display: none; }
+    @media (hover: none), (pointer: coarse) { .cursor-dot { display: none; } }
+
+    /* ------------------------------------------------------------------
+       TOPLINE + MASTHEAD
+       A persistent sticky utility bar (mono label, live clock, and a direct
+       "Let's talk" link to #contact -- reachable from anywhere on the page,
+       no menu needed), then the big &Liu wordmark and slogan.
+       ------------------------------------------------------------------ */
+    .topline {
+      position: sticky; top: 0; z-index: 60;
+      background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: start;
+      padding: 18px var(--gutter);
+      font-size: 12px; line-height: 1.35;
+    }
+    .topline .time { text-align: center; }
+    .topline .inquire { text-align: right; font-weight: bold; }
+    @media (max-width: 600px) {
+      .topline { grid-template-columns: 1fr 1fr; padding: 16px; font-size: 10px; }
+      .topline .time { display: none; }
+    }
+
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 24px; padding: 25px var(--gutter) 28px; border-bottom: 1px solid var(--ink);
+    }
+    .wordmark {
+      font-family: 'Italiana', serif; font-size: clamp(100px, 20vw, 310px); font-weight: 400;
+      line-height: 0.91; letter-spacing: -0.065em; margin: 0; white-space: nowrap;
+    }
+    .wordmark .amp { font-family: 'Marcellus', serif; color: var(--accent); letter-spacing: -0.11em; }
+    .slogan {
+      font-size: clamp(22px, 3.7vw, 58px); font-weight: 400; line-height: 1.08; letter-spacing: -0.035em;
+      margin: 0; max-width: 52%; text-transform: uppercase;
+    }
+    .slogan span { display: block; color: var(--accent); }
+    @media (max-width: 600px) {
+      .masthead { padding: 22px 16px 28px; gap: 20px; }
+      .wordmark { font-size: 29vw; }
+      .slogan { font-size: 4.4vw; max-width: 51%; letter-spacing: -0.025em; }
+    }
+
+    .details { padding: 19px var(--gutter) 0; font-size: 12px; }
+    .statement {
+      font-size: clamp(28px, 3.55vw, 62px); line-height: 1.13; font-weight: 400; letter-spacing: -0.045em;
+      margin: 29px var(--gutter) 46px; max-width: 1450px;
+    }
+    .statement em { font-style: normal; color: var(--accent); }
+    @media (max-width: 600px) { .statement { margin: 25px 16px 32px; font-size: 30px; } }
+
+    [tabindex="-1"]:focus { outline: none; } /* #contact is focusable but shows no ring */
+
+    /* ------------------------------------------------------------------
+       PROJECTS
+       ------------------------------------------------------------------ */
+    .project { padding: 18px 0 0; }
+    .project + .project { margin-top: 70px; }
+    .project-head { display: flex; justify-content: space-between; gap: 18px; margin: 0 var(--gutter) 12px; font-size: 12px; }
+    .project-head .label { display: flex; align-items: center; gap: 9px; }
+    .project-head .dot { width: 8px; height: 8px; background: var(--accent); display: inline-block; flex: none; }
+    .video-wrap { position: relative; }
+    .video-wrap video { display: block; width: 100%; aspect-ratio: var(--case-ratio); object-fit: cover; background: var(--bg); }
+    .pause {
+      position: absolute; bottom: 16px; right: 16px; background: var(--bg); color: var(--ink);
+      border: 0; border-radius: 30px; padding: 10px 16px; cursor: pointer; font-size: 12px;
+    }
+    .project-bottom { display: flex; justify-content: space-between; gap: 20px; padding: 28px var(--gutter) 40px; }
+    .project-bottom h2 { font-family: 'Italiana', serif; font-size: clamp(28px, 3.2vw, 44px); font-weight: 400; margin: 0; }
+    .project-bottom p { max-width: 530px; line-height: 1.6; margin: 0; font-size: 16px; color: var(--ink); opacity: 0.72; }
+    @media (max-width: 600px) {
+      .project-head { font-size: 9px; margin: 0 16px 12px; }
+      .project-head .label { max-width: 55%; }
+      .video-wrap video { aspect-ratio: 4/3; object-fit: contain; background: #fff; }
+      .project-bottom { display: block; padding: 20px 16px 26px; }
+      .project-bottom p { margin-top: 12px; font-size: 15px; }
+      .project + .project { margin-top: 35px; }
     }
 
     /* ------------------------------------------------------------------
-       HERO SHUTTER ANIMATION
-       The slam-in is a ONE-TIME entrance (iteration-count 1, forwards-
-       filled) — it is NOT part of the repeating loop. Every animation
-       below it (revealRightLoop, banner, tagline, amp, photo) shares a
-       1.65s delay so it only starts once the slam has landed, then loops
-       forever from translateX(0%)/scaleX(0)/opacity 0 back to the exact
-       same values — a true closed loop with no off-screen state anywhere
-       in it, so there is nothing to snap back to and nothing exposed
-       underneath at the restart. Only the ONE-TIME entrance ever visits
-       off-screen; the infinite loop never does.
-       Panels bleed 8vw past their outer screen edges (see markup), so nothing
-       here ever needs to expose that outer edge — only the center seam
-       matters, and only the right panel ever approaches it before landing.
+       ABOUT (Amy's bio) + CLIENT LOGO STRIP
+       The logo marquee mechanics (grey/color crossfade pairs, no filter or
+       opacity on the moving track, script-driven motion on touch, all the
+       Safari-safety work) are unchanged from before; only its backdrop
+       moves from the old yellow band to the new plain white page, and the
+       edge fade + "Experience with" label are restyled to match.
        ------------------------------------------------------------------ */
-    @keyframes slamInLeft {
-      0%   { transform: translateX(-100%); }
-      2%   { transform: translateX(-100%); animation-timing-function: cubic-bezier(.6,.04,.98,.34); }
-      100% { transform: translateX(0%); }
-    }
-    @keyframes slamInRight {
-      0%   { transform: translateX(100%); }
-      2%   { transform: translateX(100%);   animation-timing-function: cubic-bezier(.6,.04,.98,.34); }
-      92%  { transform: translateX(-1.8%);  animation-timing-function: ease-out; }
-      96%  { transform: translateX(0.6%); }
-      100% { transform: translateX(0%); }
-    }
-    /* the repeating ambient loop: right panel bounces open to the photo
-       sliver, holds, closes, coral banner sweeps in, tagline, closes again */
-    @keyframes revealRightLoop {
-      0%     { transform: translateX(0%);  animation-timing-function: cubic-bezier(.5,0,.7,0); }
-      4%     { transform: translateX(68%); animation-timing-function: cubic-bezier(.3,.9,.6,1); }
-      9.33%  { transform: translateX(46%); animation-timing-function: ease-out; }
-      10.67% { transform: translateX(56%); }
-      25.33% { transform: translateX(56%); }
-      34.67% { transform: translateX(56%); animation-timing-function: ease-in; }
-      42.67% { transform: translateX(0%); }
-      100%   { transform: translateX(0%); }
-    }
-    /* Opacity is stepped to 0 whenever the banner is scaled down to nothing. Safari can paint
-       a hairline for a zero-width element (a 1px coral line down the center of the hero on
-       iPhone), so while closed it must not be painted at all. The steps are ~0.5ms wide, so
-       they read as instant and the sweep itself looks exactly as before. */
-    @keyframes bannerSweep {
-      0%      { transform: scaleX(0); opacity: 0; }
-      25.32%  { opacity: 0; }
-      25.33%  { transform: scaleX(0); opacity: 1; animation-timing-function: cubic-bezier(.22,1,.36,1); }
-      34.67%  { transform: scaleX(1); }
-      81.33%  { transform: scaleX(1); animation-timing-function: ease-in; }
-      90.67%  { transform: scaleX(0); opacity: 1; }
-      90.68%  { opacity: 0; }
-      100%    { transform: scaleX(0); opacity: 0; }
-    }
-    @keyframes taglineFade {
-      0%     { opacity: 0; }
-      25.33% { opacity: 0; }
-      34.67% { opacity: 1; }
-      81.33% { opacity: 1; }
-      89.33% { opacity: 0; }
-      100%   { opacity: 0; }
-    }
-    /* the ampersand swaps to cream once the coral banner is behind it,
-       so it never disappears into its own color */
-    @keyframes ampSwap {
-      0%     { color: var(--accent); }
-      25.33% { color: var(--accent); }
-      34.67% { color: var(--bg); }
-      81.33% { color: var(--bg); }
-      89.33% { color: var(--accent); }
-      100%   { color: var(--accent); }
-    }
-    /* the photo stays fully transparent for the entire one-time entrance (the
-       base opacity:0 below, while the delay hasn't elapsed yet) so it can
-       never show before the panels arrive. The instant the ambient loop
-       starts, it snaps straight to fully visible — no fade — so it's
-       already sitting there the moment the shutters crack open, instead of
-       dissolving in after the gap has already appeared. It never needs to
-       hide again after that: the shutters/banner always physically cover it
-       whenever the gap isn't supposed to be open. */
-    @keyframes photoReveal {
-      0%   { opacity: 1; }
-      100% { opacity: 1; }
-    }
-    .reveal-left  { animation: slamInLeft 1.65s 1 forwards; }
-    .reveal-right {
-      animation:
-        slamInRight 1.65s 1 forwards,
-        revealRightLoop 4.95s 1.65s infinite;
-    }
-    .banner       { animation: bannerSweep 4.95s 1.65s infinite; transform-origin: center; }
-    .amp          { animation: ampSwap 4.95s 1.65s infinite; }
-    .tagline      { animation: taglineFade 4.95s 1.65s infinite; }
-    /* The banner tagline sits on one line. Its & is the logo's own glyph (Marcellus), a small echo of the
-       wordmark. It deliberately doesn't use the .amp class: that one is tied to the wordmark's color
-       animation and to the header script, which looks up the first .amp inside the hero. */
-    .tagline-text { white-space: nowrap; font-size: clamp(30px, 4.4vw, 64px); }
-    /* one line has to fit the narrowest phones (360px) with room to spare, so shrink a little there */
-    @media (max-width: 480px) { .tagline-text { font-size: clamp(24px, 7.4vw, 30px); } }
-    .tag-amp { font-family: 'Marcellus', serif; }
-    .hero-photo   { opacity: 0; animation: photoReveal 1s 1.65s 1 forwards; }
+    .about { padding: 100px var(--gutter); display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; align-items: center; }
+    .eyebrow { color: var(--accent); margin-bottom: 24px; font-size: 12px; }
+    .about h2 { font-family: 'Italiana', serif; font-weight: 400; font-size: clamp(38px, 5vw, 76px); line-height: 1.05; letter-spacing: -0.01em; margin: 0 0 30px; }
+    .about p { font-size: 18px; line-height: 1.65; max-width: 600px; margin: 0 0 20px; opacity: 0.85; }
+    .portrait { width: 100%; max-height: 540px; object-fit: cover; object-position: center 35%; }
+    @media (max-width: 600px) { .about { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; } .about p { font-size: 16px; } .portrait { max-height: 380px; } }
 
-    /* Hold the hero on its orange service slide while the new intro is developed. */
-    .hero-viewport .reveal-left,
-    .hero-viewport .reveal-right,
-    .hero-viewport .hero-photo { animation: none; visibility: hidden; }
-    .hero-viewport .banner { animation: none; transform: scaleX(1); opacity: 1; }
-    .hero-viewport .tagline { animation: none; opacity: 1; }
-    .amp { animation: none; color: var(--bg); }
-
-    /* Case-study media runs full-bleed: it cancels the section's side padding, while the
-       titles and descriptions above and below stay on the gutter. Capped at 82vh so on very
-       wide screens the crop can't grow taller than the window. */
-    .case-media {
-      position: relative;
-      width: calc(100% + 2 * var(--gutter));
-      margin-left: calc(-1 * var(--gutter));
-      max-height: 82vh;
+    .experience { padding: 30px var(--gutter) 70px; }
+    @keyframes logoScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .logo-marquee { position: relative; width: 100%; overflow: hidden; padding: 18px 0; margin-top: 24px; }
+    .logo-marquee::before, .logo-marquee::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 8%; z-index: 1; pointer-events: none;
     }
-
-    /* ------------------------------------------------------------------
-       CLIENT LOGO MARQUEE
-       Two copies of the logo set sit back to back in one flex track;
-       animating it exactly -50% loops seamlessly since that's the width
-       of one full copy. The band sits on the hero's shutter yellow, with
-       every logo a warm dark grey until hovered, when it lights up in its
-       own brand colors and bubbles up ~35% (the overshoot easing is what
-       makes it pop rather than just grow). The track pauses on hover so
-       the logo under the cursor actually stays put — without that, the
-       strip keeps sliding while you're hovering and the reveal ends up
-       landing on whatever logo has drifted underneath, not the one you
-       meant. The marquee has vertical padding because overflow:hidden
-       would otherwise clip the top and bottom of a magnified logo.
-       ------------------------------------------------------------------ */
-    @keyframes logoScroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    /* Safari-safe on purpose. iPhone Safari kept leaving parts of this strip unpainted while it
-       scrolled: half a logo, or a whole blank stretch with a hard vertical edge. So everything it
-       struggles with is gone from the moving strip: no mask (the edge fades are two yellow
-       overlays), no filter and no opacity on the moving pieces (each logo is a pre-made grey copy
-       with its colour original stacked on top, and hover/tap just crossfades them), no will-change
-       on the wide track, and on touch screens a small script moves the track instead of a CSS
-       animation (see the script). */
-    .logo-marquee {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      padding: 18px 0;
-    }
-    .logo-marquee::before,
-    .logo-marquee::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 8%;
-      z-index: 1;
-      pointer-events: none;
-    }
-    /* the rgba is --shutterPale (#FFC200) at 0% alpha: keep them in sync */
-    .logo-marquee::before { left: 0;  background: linear-gradient(90deg,  var(--shutterPale), rgba(255, 194, 0, 0)); }
-    .logo-marquee::after  { right: 0; background: linear-gradient(270deg, var(--shutterPale), rgba(255, 194, 0, 0)); }
+    .logo-marquee::before { left: 0;  background: linear-gradient(90deg,  var(--bg), rgba(255,255,255,0)); }
+    .logo-marquee::after  { right: 0; background: linear-gradient(270deg, var(--bg), rgba(255,255,255,0)); }
     .logo-track {
       --logo-gap: clamp(56px, 7vw, 96px);
-      display: flex;
-      align-items: center;
-      width: max-content;
-      gap: var(--logo-gap);
-      padding-right: var(--logo-gap); /* makes 50% of the width exactly one set of logos plus its gap, so the loop has no jump */
+      display: flex; align-items: center; width: max-content; gap: var(--logo-gap);
+      padding-right: var(--logo-gap);
       animation: logoScroll 34s linear infinite;
     }
-    .logo-track.is-driven { animation: none; } /* touch screens: the script moves it */
-    .logo-item {
-      position: relative;
-      flex: none;
-      display: block;
+    .logo-track.is-driven { animation: none; }
+    .logo-item { position: relative; flex: none; display: block;
       height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
-      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
-    }
-    .logo-item img {
-      display: block;
-      height: 100%;
-      width: auto;
-      max-width: none;
-    }
+      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1); }
+    .logo-item img { display: block; height: 100%; width: auto; max-width: none; }
     .logo-item .logo-grey  { transition: opacity .25s ease; }
-    .logo-item .logo-color {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      opacity: 0;
-      transition: opacity .25s ease;
-    }
-    /* Optical balance. With one shared height, wide wordmarks (Samsung) read far bigger than compact
-       marks (H&M, Under Armour, FrieslandCampina). Each logo's height is multiplied by a scale so
-       their visible size (geometric mean of ink width x height) lands in the same range. It's a
-       uniform scale of the height with width:auto, so every logo keeps its proportions. */
+    .logo-item .logo-color { position: absolute; top: 0; left: 0; width: 100%; opacity: 0; transition: opacity .25s ease; }
     .logo-item[data-logo="hm"]               { --logo-scale: 1.45; }
     .logo-item[data-logo="samsung"]          { --logo-scale: 0.88; }
     .logo-item[data-logo="underarmour"]      { --logo-scale: 1.5; }
     .logo-item[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
-    /* The light-up has two triggers that do the same thing. Mouse devices use :hover. Touch
-       screens have no hover (iOS fakes it by leaving :hover stuck on whatever was touched last,
-       which is unreliable), so a script toggles .is-lit / .is-held while a finger is on a logo
-       instead. Hover rules are limited to hover-capable devices so the two never fight. */
     @media (hover: hover) {
       .logo-track:hover { animation-play-state: paused; }
       .logo-item:hover { transform: scale(1.35); }
@@ -312,310 +201,155 @@
     .logo-item.is-lit { transform: scale(1.35); }
     .logo-item.is-lit .logo-color { opacity: 1; }
     .logo-item.is-lit .logo-grey  { opacity: 0; }
-    /* pressing a logo shouldn't flash a tap highlight or pop iOS's Save Image / drag menu */
     .logo-item, .logo-item img {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-user-drag: none;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+      -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
     }
+    @media (max-width: 600px) { .experience { padding: 15px 16px 40px; } }
 
     /* ------------------------------------------------------------------
-       CONTACT FORM
-       Dark band closing the page (same --heroShutter as the hero's left
-       panel), cream text, yellow button. Fields are underline-only to
-       match the editorial serif type above.
+       CONTACT + FOOTER (unchanged colors/copy from before)
        ------------------------------------------------------------------ */
-    .contact-field { display: block; margin-bottom: 32px; }
-    .contact-field span {
-      display: block;
-      font-family: 'Archivo', sans-serif;
-      font-weight: 500;
-      font-size: 13px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--bg);
-      opacity: 0.7;
-      margin-bottom: 8px;
-    }
-    .contact-field input,
-    .contact-field textarea {
-      width: 100%;
-      background: transparent;
-      border: 0;
-      border-bottom: 1px solid rgba(251, 238, 230, 0.4);
-      border-radius: 0;
-      padding: 10px 0;
-      font-family: 'Archivo', sans-serif;
-      font-size: 18px;
-      color: var(--bg);
-      outline: none;
+    .contact { background: var(--dark); color: var(--cream); padding: 100px var(--gutter) 70px; display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; scroll-margin-top: 24px; }
+    .contact h2 { font-family: 'Italiana', serif; font-weight: 400; font-size: clamp(38px, 5vw, 76px); line-height: 1.05; margin: 0 0 30px; color: var(--accent); }
+    .contact p { font-size: 17px; line-height: 1.6; max-width: 410px; color: #ddd3cb; }
+    .contact-field { display: block; margin: 0 0 30px; }
+    .contact-field span { display: block; font-family: 'Space Mono', monospace; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; opacity: 0.8; }
+    .contact-field input, .contact-field textarea {
+      display: block; width: 100%; border: 0; border-bottom: 1px solid #82756c; border-radius: 0;
+      background: transparent; padding: 12px 0; font: 18px 'Archivo', Arial, sans-serif; color: var(--cream); outline: none;
       transition: border-color .2s ease;
     }
-    .contact-field textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
-    .contact-field input:focus,
-    .contact-field textarea:focus { border-bottom-color: var(--shutterPale); }
+    .contact-field textarea { resize: vertical; min-height: 120px; }
+    .contact-field input:focus, .contact-field textarea:focus { border-color: var(--accent); }
     .contact-hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
-    .contact-submit {
-      font-family: 'Archivo', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: var(--shutterPale);
-      color: var(--ink);
-      border: 0;
-      padding: 18px 40px;
-      cursor: pointer;
-      transition: opacity .2s ease;
-    }
-    .contact-submit:hover { opacity: 0.85; }
+    .contact-submit { background: var(--accent); color: #fff; border: 0; padding: 18px 28px; font: 14px 'Archivo', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: opacity .2s ease; }
+    .contact-submit:hover { opacity: 0.85; text-decoration: none; }
     .contact-submit:disabled { opacity: 0.5; cursor: default; }
-    .contact-submit:focus-visible { outline: 2px solid var(--bg); outline-offset: 3px; }
-    .contact-status {
-      margin-top: 20px;
-      min-height: 1.5em;
-      font-family: 'Archivo', sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--bg);
-    }
-    .contact-status--error { color: var(--shutterPale); }
+    .contact-submit:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+    .contact-status { margin-top: 18px; min-height: 1.5em; line-height: 1.5; }
+    .contact-status--error { color: #ffb49d; }
+    @media (max-width: 600px) { .contact { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; scroll-margin-top: 16px; } }
+
+    .footer { display: flex; justify-content: space-between; padding: 30px var(--gutter); background: var(--dark); color: #c4b7ac; font-size: 11px; }
+    @media (max-width: 600px) { .footer { padding: 25px 16px; font-size: 10px; } }
 
     /* ------------------------------------------------------------------
-       SITE MENU
-       The hamburger opens a full-screen coral overlay (same coral and cream
-       serif as the hero's banner tagline) with the three section links.
-       Hidden with visibility, not display, so it can fade; visibility also
-       keeps its links out of the tab order while closed. The 44px+ tap
-       target on the toggle is built from padding, offset so the three lines
-       stay exactly where the old bare icon sat.
+       INTRO
+       Confined to the topline+masthead+details+statement block only (NOT
+       the whole page, NOT scroll-locked -- everything below is normal,
+       reachable, scrollable DOM flow the entire time it plays, same as
+       remotemountain.com's own intro). & fades in, dissolves into a traced
+       rectangle, the rectangle fills solid white and grows to exactly
+       cover this block, then the whole thing fades to reveal the real
+       page, which has been sitting underneath, already laid out, the
+       whole time.
        ------------------------------------------------------------------ */
-    .menu-toggle {
-      position: absolute;
-      top: calc(clamp(28px, 4.4vw, 56px) - 14px);
-      right: calc(clamp(24px, 4vw, 56px) - 14px);
-      z-index: 30;
-      /* own compositing layer, same reason as the name: keeps iPhone Safari from painting the
-         animated shutters over the icon on first load */
-      transform: translateZ(0);
-      will-change: transform;
-      padding: 14px;
-      background: none;
-      border: 0;
-      cursor: pointer;
-      line-height: 0;
+    .hero-wrap { position: relative; }
+    .intro { position: absolute; inset: 0; z-index: 55; background: #000; opacity: 1; transition: opacity .5s ease; }
+    .intro.is-done { display: none; }
+    .intro.is-fading { opacity: 0; }
+    .intro-stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; }
+    .intro-amp {
+      font-family: 'Marcellus', serif; color: #fff; font-size: clamp(120px, 22vw, 320px); line-height: 1;
+      opacity: 0; transform: scale(0.92); transition: opacity .45s ease, transform .45s ease;
     }
-    .menu-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-
-    .menu {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--accent);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .35s ease, visibility 0s .35s;
-    }
-    .menu.is-open { opacity: 1; visibility: visible; transition: opacity .35s ease; }
-    .menu ul { list-style: none; margin: 0; padding: 0; text-align: center; }
-    .menu li {
-      opacity: 0;
-      transform: translateY(16px);
-      transition: opacity .4s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
-    }
-    .menu.is-open li { opacity: 1; transform: none; }
-    .menu.is-open li:nth-child(1) { transition-delay: .08s; }
-    .menu.is-open li:nth-child(2) { transition-delay: .16s; }
-    .menu.is-open li:nth-child(3) { transition-delay: .24s; }
-    .menu a {
-      display: inline-block;
-      padding: 6px 12px;
-      font-family: 'Bodoni Moda', serif;
-      font-weight: 500;
-      font-size: clamp(44px, 8vw, 96px);
-      line-height: 1.15;
-      color: var(--bg);
-      transition: color .2s ease;
-    }
-    .menu a:hover { opacity: 1; color: var(--ink); }
-    .menu a:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
-    .menu-close {
-      position: absolute;
-      top: calc(clamp(28px, 4.4vw, 56px) - 14px);
-      right: calc(clamp(24px, 4vw, 56px) - 14px);
-      padding: 14px;
-      background: none;
-      border: 0;
-      color: var(--bg);
-      cursor: pointer;
-      line-height: 0;
-      transition: color .2s ease;
-    }
-    .menu-close:hover { color: var(--ink); }
-    .menu-close:focus-visible { outline: 2px solid var(--bg); outline-offset: 2px; }
-
-    /* ------------------------------------------------------------------
-       SITE HEADER
-       A compact bar, &Liu on the left and the hamburger on the right, that follows you down
-       the page. It stays hidden while the hero's own big name and icon are on screen, fades in
-       once they've scrolled away (transparent over the rest of the hero), and turns solid
-       dark once the hero is behind it, so it stays readable over the work. It reuses the
-       hero's .amp class so the ampersand swaps color in step with the banner while transparent;
-       once solid it stays coral.
-       ------------------------------------------------------------------ */
-    .site-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      height: var(--header-h);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 var(--gutter);
-      background: transparent;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: opacity .3s ease, transform .3s ease, background-color .3s ease, box-shadow .3s ease, visibility 0s .3s;
-    }
-    .site-header.is-on {
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-      transition: opacity .3s ease, transform .3s ease, background-color .3s ease, box-shadow .3s ease;
-    }
-    .site-header.is-solid { background: var(--heroShutter); box-shadow: 0 1px 0 rgba(251, 238, 230, 0.12); }
-    .site-logo {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      font-size: clamp(28px, 3vw, 36px);
-      line-height: 1;
-      letter-spacing: 0.03em;
-      color: var(--bg);
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
-    }
-    .site-logo .amp { font-family: 'Marcellus', serif; }
-    .site-logo .liu { font-family: 'Italiana', serif; color: var(--bg); }
-    .site-logo:hover { opacity: 0.8; }
-    .site-logo:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
-    .site-header.is-solid .amp { animation: none; color: var(--accent); }
-    /* the header's hamburger sits in the flex row instead of being pinned inside the hero; the
-       negative margin cancels its 14px tap padding so the three lines line up with the gutter */
-    .site-header .menu-toggle {
-      position: relative;
-      top: auto;
-      right: auto;
-      margin-right: -14px;
-      color: var(--ink);
-      transition: color .3s ease;
-    }
-    .site-header.is-solid .menu-toggle { color: var(--bg); }
-    [tabindex="-1"]:focus { outline: none; } /* sections take focus after a menu jump, without a ring */
-
-    /* respect users who ask for less motion */
+    .intro-amp.is-in { opacity: 1; transform: scale(1); }
+    .intro-amp.is-out { opacity: 0; transition: opacity .3s ease; }
+    .intro-trace { position: absolute; overflow: visible; }
+    .intro-trace rect { fill: none; stroke: #fff; stroke-width: 3; }
+    .intro-box { position: absolute; background: #fff; }
     @media (prefers-reduced-motion: reduce) {
-      .site-header, .site-header .menu-toggle { transition: none; }
+      .intro { transition: none; }
+      .intro-amp { transition: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
       .menu, .menu li { transition: none; }
-      .reveal-left, .reveal-right, .banner, .amp, .tagline, .hero-photo, .logo-track { animation: none; }
       .logo-item:hover, .logo-item.is-lit { transform: none; }
-      .tagline { opacity: 1; }
-      .banner  { transform: scaleX(1); }
-      .amp     { color: var(--bg); }
-      html     { scroll-behavior: auto; }
+      html { scroll-behavior: auto; }
     }
   </style>
 </head>
 <body>
 
-<!-- compact header: appears once the hero's own name and menu icon have scrolled away
-     (see the script at the bottom) -->
-<header class="site-header" id="site-header">
-  <a class="site-logo" href="#top" aria-label="&amp;Liu, back to top"><span class="amp">&amp;</span><span class="liu">Liu</span></a>
-  <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
-    <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true">
-      <rect width="26" height="2" style="fill:currentColor"></rect>
-      <rect y="8" width="26" height="2" style="fill:currentColor"></rect>
-      <rect y="16" width="26" height="2" style="fill:currentColor"></rect>
-    </svg>
-  </button>
-</header>
+<div class="topline mono">
+  <div>Web design &amp; branding<br>For businesses moving forward.</div>
+  <div class="time" id="clock">00:00:00 / PT</div>
+  <a class="inquire" href="#contact">Let&rsquo;s talk &#8599;</a>
+</div>
 
-<div id="top" style="width:100%;position:relative;background:var(--bg);">
+<div class="hero-wrap" id="heroWrap">
+  <header class="masthead">
+    <h1 class="wordmark" aria-label="&amp;Liu"><span class="amp">&amp;</span>Liu</h1>
+    <p class="slogan">Agency caliber work.<span>Without the agency.</span></p>
+  </header>
+  <div class="details mono"><div>Los Angeles&ndash;based digital design studio.</div></div>
+  <p class="statement">Thoughtful websites and distinctive brands.<br>Built around <em>your business.</em></p>
 
-  <!-- ================= HERO ================= -->
-  <div class="hero-viewport" style="width:100%;height:100vh;min-height:560px;position:relative;overflow:hidden;">
+  <!-- intro overlay: scoped to this block only via the position:relative wrapper above --
+       nothing below the statement is affected, and page scroll is never locked -->
+  <div class="intro" id="intro">
+    <div class="intro-amp" id="introAmp">&amp;</div>
+    <svg class="intro-trace" id="introTrace"><rect id="traceRect" x="0" y="0" width="0" height="0"></rect></svg>
+    <div class="intro-box" id="introBox" style="display:none;"></div>
+  </div>
+</div>
 
-    <!-- hero photo, sized to the exact slice the shutters open (50%–84% of the frame). Coral
-         fallback backdrop (not cream) so the one-time entrance never exposes a bare/awkward
-         moment — the photo itself only fades in on cue, during its own reveal window. -->
-    <div style="position:absolute;inset:0;background:var(--accent);overflow:hidden;z-index:1;">
-      <img class="hero-photo" src="images/hero-amy.jpg" alt="Amy speaking on stage at a conference, seated among floral arrangements" style="position:absolute;top:0;left:50%;width:34%;height:100%;object-fit:cover;object-position:44% center;">
-    </div>
+<main>
 
-    <!-- shutter panels: closed at center in a dark neutral + pale coral pair, bounce open to a
-         sliver, hold, then get covered by the bold coral banner sweep -->
-    <!-- the left panel runs 2px past center, tucked under the right one, so the center seam is
-         always covered. Two panels meeting at exactly 50% leave a sub-pixel gap on phones whose
-         half-width isn't a whole device pixel, and the coral backdrop shows through as a line. -->
-    <div class="reveal-left" style="position:absolute;top:0;bottom:0;left:-8vw;width:calc(50% + 8vw + 2px);background:var(--heroShutter);z-index:10;"></div>
-    <div class="reveal-right" style="position:absolute;top:0;bottom:0;right:-8vw;width:calc(50% + 8vw);background:var(--shutterPale);z-index:10;"></div>
+  <div id="work">
 
-    <!-- full-screen brand banner, opens outward from center to cover shutters + photo entirely -->
-    <div class="banner" style="position:absolute;inset:0;background:var(--accent);z-index:20;"></div>
+    <section class="project" aria-label="Samsung SmartThings">
+      <div class="project-head mono"><span class="label"><span class="dot"></span>Website / UX / Interaction design</span><span>01 &mdash; Selected work</span></div>
+      <div class="video-wrap">
+        <video src="images/smartthings-reel.mp4" poster="images/smartthings-video-still.jpg" muted loop playsinline preload="metadata" aria-label="Samsung SmartThings project reel"></video>
+        <button class="pause mono" type="button">Play reel</button>
+      </div>
+      <div class="project-bottom">
+        <h2>Samsung SmartThings</h2>
+        <p>User experience and interaction design for the Samsung SmartThings website, part of a website and branding refresh for the smart home product line.</p>
+      </div>
+    </section>
 
-    <!-- big centered tagline, revealed only while the coral banner is open -->
-    <div class="tagline" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;text-align:center;z-index:25;">
-      <div class="tagline-text" style="font-family:'Bodoni Moda',serif;font-weight:500;line-height:1.25;letter-spacing:0.01em;color:var(--bg);">Branding <span class="tag-amp">&amp;</span> Web Design</div>
-    </div>
+    <section class="project" aria-label="Okie Media">
+      <div class="project-head mono"><span class="label"><span class="dot"></span>Brand identity / Website design</span><span>02 &mdash; Selected work</span></div>
+      <div class="video-wrap">
+        <video src="images/okie-showcase-v2-web.mp4" poster="images/okie-showcase-v2-poster.jpg" muted loop playsinline preload="metadata" aria-label="Okie Media project reel"></video>
+        <button class="pause mono" type="button">Play reel</button>
+      </div>
+      <div class="project-bottom">
+        <h2>Okie Media</h2>
+        <p>Identity and website design for an award-winning video production studio whose clients include NBC and Netflix.</p>
+      </div>
+    </section>
 
-    <!-- name, pinned on top of everything, stays put through every phase of the animation.
-         translateZ(0)/will-change give it its own compositing layer: the shutters and banner
-         below it are animated (so Safari composites them), and without this iPhone Safari can
-         paint them over the name on first load until a scroll forces a repaint. -->
-    <div style="position:absolute;top:clamp(24px,4vw,48px);left:clamp(24px,4vw,56px);max-width:620px;z-index:30;transform:translateZ(0);will-change:transform;">
-      <div style="font-weight:400;font-size:clamp(44px,5.6vw,80px);line-height:1;letter-spacing:0.03em;text-shadow:0 2px 24px rgba(0,0,0,0.25);display:flex;align-items:baseline;gap:6px;"><span class="amp" style="font-family:'Marcellus',serif;">&amp;</span><span style="font-family:'Italiana',serif;color:var(--bg);">Liu</span></div>
-    </div>
-
-    <!-- hamburger, pinned top-right: opens the full-screen menu (see #site-menu below) -->
-    <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
-      <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true">
-        <rect width="26" height="2" style="fill:var(--ink)"></rect>
-        <rect y="8" width="26" height="2" style="fill:var(--ink)"></rect>
-        <rect y="16" width="26" height="2" style="fill:var(--ink)"></rect>
-      </svg>
-    </button>
+    <section class="project" aria-label="WEASE">
+      <div class="project-head mono"><span class="label"><span class="dot"></span>Rebranding / Website design</span><span>03 &mdash; Selected work</span></div>
+      <div class="video-wrap">
+        <video src="images/wease-project-reel-web.mp4" poster="images/wease-site-still.jpg" muted loop playsinline preload="metadata" aria-label="WEASE project reel" style="object-position:62% 50%;"></video>
+        <button class="pause mono" type="button">Play reel</button>
+      </div>
+      <div class="project-bottom">
+        <h2>WEASE</h2>
+        <p>Full rebrand and site design for a Swedish cross-country ski startup &mdash; client workshops, market research, and a complete brand book.</p>
+      </div>
+    </section>
 
   </div>
 
-  <!-- ================= ABOUT =================
-       The coral rule is a flourish above the headline. -->
-  <div id="about" style="width:100%;padding:clamp(64px,9vw,120px) 0;background:var(--bg);">
-
-    <div style="max-width:760px;margin:0 auto;padding:0 clamp(24px,4vw,56px);text-align:center;">
-      <div style="width:48px;height:3px;background:var(--accent);margin:0 auto 28px;"></div>
-      <div style="font-family:'Marcellus',serif;font-size:clamp(26px,3vw,40px);line-height:1.3;color:var(--ink);margin-bottom:24px;">Agency-caliber work. Without the agency.</div>
-      <div style="font-family:'Archivo',sans-serif;font-weight:400;font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--ink);opacity:0.72;">Founded by Amy Liu, whose agency experience includes work for brands like Samsung and Unilever, &amp;Liu Studio works directly with startups and independent businesses. The same quality and the same craft — without the extra layers or enterprise minimums.</div>
+  <section class="about" id="about">
+    <div>
+      <div class="eyebrow mono">The person behind the studio</div>
+      <h2>Hi, I&rsquo;m Amy.<br>Your design partner.</h2>
+      <p>I founded &amp;Liu Studio to bring agency-level craft directly to startups and independent businesses.</p>
+      <p>My agency experience includes work for brands like Samsung and Unilever. Now, I work directly with you to shape a website and identity that feel like your business &mdash; with the same care, and fewer layers.</p>
     </div>
+    <img class="portrait" src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" loading="lazy">
+  </section>
 
-  </div>
-
-  <!-- ================= TRUSTED BY =================
-       Full-width band in the hero's shutter yellow. "Trusted By" is set in the
-       same italic serif already used for the case-study subtitles below (e.g.
-       "Website design — UX & interaction design"), so it reads as this section's
-       own voice rather than a bolted-on eyebrow label. -->
-  <div style="width:100%;padding:clamp(36px,4.5vw,56px) 0;background:var(--shutterPale);">
-
-    <div style="text-align:center;font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(15px,1.4vw,18px);color:var(--ink);margin:0 0 clamp(6px,1.4vw,14px);">Experience with</div>
-
+  <section class="experience" aria-label="Agency experience">
+    <div class="mono">Experience with</div>
     <div class="logo-marquee">
       <div class="logo-track">
         <span class="logo-item" data-logo="hm"><img class="logo-grey" src="images/logos/grey/hm.png" alt="H&amp;M"><img class="logo-color" src="images/logos/hm.svg" alt="" aria-hidden="true"></span>
@@ -636,132 +370,84 @@
         <span class="logo-item" data-logo="frieslandcampina" aria-hidden="true"><img class="logo-grey" src="images/logos/grey/frieslandcampina.png" alt=""><img class="logo-color" src="images/logos/frieslandcampina.png" alt=""></span>
       </div>
     </div>
+  </section>
 
-  </div>
-
-  <!-- ================= SELECTED WORK ================= -->
-  <div id="work" style="width:100%;padding:clamp(64px,8vw,104px) var(--gutter) clamp(72px,8.5vw,112px);background:#FFFFFF;">
-
-    <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">Selected Work</div>
-
-    <!-- case study 1: Samsung SmartThings -->
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:20px;margin-bottom:32px;flex-wrap:wrap;">
-      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">Samsung SmartThings</div>
-      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Website design — user experience &amp; interaction design</div>
+  <section class="contact" id="contact" tabindex="-1">
+    <div>
+      <div class="eyebrow mono">Have something in mind?</div>
+      <h2>Let&rsquo;s build<br>something.</h2>
+      <p>Tell me a little about your project. I read every message and reply within two business days.</p>
     </div>
+    <form id="contact-form" novalidate>
+      <label class="contact-field"><span>Name</span><input type="text" name="name" autocomplete="name" required></label>
+      <label class="contact-field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+      <label class="contact-field"><span>About your project</span><textarea name="message" rows="5" required></textarea></label>
+      <!-- honeypot: real visitors never see or fill this; bots do -->
+      <label class="contact-hp" aria-hidden="true">Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+      <button type="submit" class="contact-submit">Send message</button>
+      <div class="contact-status" role="status" aria-live="polite"></div>
+    </form>
+  </section>
 
-    <!-- video preview: real project reel, muted so autoplay is allowed by browsers;
-         starts playing once scrolled into view and pauses once scrolled away (see script). -->
-    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
-      <video class="scroll-autoplay-video" src="images/smartthings-reel.mp4" poster="images/smartthings-video-still.jpg" muted loop playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
-      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Project reel</div>
-    </div>
+</main>
 
-    <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
-      User experience and interaction design for the Samsung SmartThings website, part of a website and branding refresh for the smart home product line.
-    </div>
-
-    <!-- case study 2: Okie Media -->
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:clamp(56px,7vw,96px);margin-bottom:32px;flex-wrap:wrap;">
-      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">Okie Media</div>
-      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Brand identity &amp; website — video production studio</div>
-    </div>
-
-    <!-- muted autoplay walkthrough, same behavior as the reel above (see the script at the bottom) -->
-    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--bg);overflow:hidden;">
-      <video class="scroll-autoplay-video" src="images/okie-showcase-v2-web.mp4" poster="images/okie-showcase-v2-poster.jpg" muted loop playsinline preload="metadata" aria-label="Scrolling walkthrough of the Okie Media website" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
-      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Site walkthrough</div>
-    </div>
-
-    <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
-      Identity and website design for an award-winning video production studio whose clients include NBC and Netflix.
-    </div>
-
-    <!-- case study 3: WEASE -->
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:clamp(56px,7vw,96px);margin-bottom:32px;flex-wrap:wrap;">
-      <div style="font-family:'Italiana',serif;font-size:clamp(28px,3.2vw,44px);color:var(--ink);">WEASE</div>
-      <div style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(14px,1.4vw,18px);color:var(--ink);opacity:0.6;">Rebrand &amp; web design — Swedish cross-country ski brand</div>
-    </div>
-
-    <!-- muted autoplay reel, same behavior as the others (see the script at the bottom). The crop is nudged
-         right (object-position) so the "Live our Experiences" frame keeps its last letters on a phone. -->
-    <div class="case-media" style="aspect-ratio:var(--case-ratio);background:var(--ink);overflow:hidden;">
-      <video class="scroll-autoplay-video" src="images/wease-project-reel-web.mp4" poster="images/wease-site-still.jpg" muted loop playsinline preload="metadata" aria-label="WEASE project reel: mobile site, website design and brand extensions" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 50%;"></video>
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.4));pointer-events:none;"></div>
-      <div style="position:absolute;left:var(--gutter);bottom:24px;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--bg);opacity:0.85;">Rebranding walkthrough</div>
-    </div>
-
-    <div style="margin-top:22px;max-width:720px;font-family:'Archivo',sans-serif;font-size:15px;line-height:1.65;color:var(--ink);opacity:0.72;">
-      Full rebrand and site design for a Swedish cross-country ski startup — client workshops, market research, and a complete brand book.
-    </div>
-
-  </div>
-
-  <!-- ================= CONTACT ================= -->
-  <div id="contact" style="width:100%;padding:clamp(72px,9vw,128px) clamp(24px,4vw,56px) clamp(56px,6vw,80px);background:var(--heroShutter);">
-    <div style="max-width:720px;margin:0 auto;">
-
-      <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--shutterPale);">Contact</div>
-      <div style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(34px,4.4vw,60px);line-height:1.15;color:var(--bg);margin:20px 0 16px;">Let&rsquo;s build something.</div>
-      <div style="font-family:'Archivo',sans-serif;font-size:clamp(17px,1.5vw,20px);line-height:1.6;color:var(--bg);opacity:0.72;margin-bottom:56px;">Tell me a little about your project. I read every message and reply within two business days.</div>
-
-      <form id="contact-form" novalidate>
-        <label class="contact-field"><span>Name</span><input type="text" name="name" autocomplete="name" required></label>
-        <label class="contact-field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
-        <label class="contact-field"><span>About your project</span><textarea name="message" rows="5" required></textarea></label>
-        <!-- honeypot: real visitors never see or fill this; bots do -->
-        <label class="contact-hp" aria-hidden="true">Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
-        <button type="submit" class="contact-submit">Send message</button>
-        <div class="contact-status" role="status" aria-live="polite"></div>
-      </form>
-
-    </div>
-  </div>
-
-  <!-- footer -->
-  <div style="width:100%;padding:0 clamp(24px,4vw,56px) 40px;background:var(--heroShutter);">
-    <div style="max-width:720px;margin:0 auto;padding-top:32px;border-top:1px solid rgba(251,238,230,0.2);font-family:'Archivo',sans-serif;font-size:13px;color:var(--bg);opacity:0.55;">&copy; 2026 &amp;Liu</div>
-  </div>
-
-</div>
-
-<!-- full-screen menu, opened by the hamburger in the hero -->
-<nav id="site-menu" class="menu" aria-label="Main menu">
-  <button type="button" class="menu-close" aria-label="Close menu">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-      <path d="M2 2L24 24M24 2L2 24" stroke="currentColor" stroke-width="2"></path>
-    </svg>
-  </button>
-  <ul>
-    <li><a href="#about">About</a></li>
-    <li><a href="#work">Work</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
+<footer class="footer mono">
+  <span>&copy; 2026 &amp;Liu Studio</span>
+  <span>Web design &amp; branding</span>
+</footer>
 
 <div class="cursor-dot" aria-hidden="true"></div>
 
 <script>
-  // Case study videos: play once scrolled into view, pause once scrolled away.
+  // Live clock in the topline (America/Los_Angeles) -- purely decorative, matches the
+  // reference sites this design took cues from.
   (function () {
-    var videos = document.querySelectorAll('.scroll-autoplay-video');
-    if (!videos.length || !('IntersectionObserver' in window)) return;
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.play().catch(function () {});
-        } else {
-          entry.target.pause();
-        }
-      });
-    }, { threshold: 0.4 });
-    videos.forEach(function (v) { observer.observe(v); });
+    var el = document.getElementById('clock');
+    if (!el) return;
+    function tick() {
+      el.textContent = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Los_Angeles'
+      }).format(new Date()) + ' / PT';
+    }
+    tick();
+    setInterval(tick, 1000);
   })();
 
-  // Contact form: validates, then POSTs to a form-handling service (Formspree-style: multipart
-  // POST + Accept: application/json). Paste the service's endpoint URL below to go live.
+  // Case study videos: autoplay muted once scrolled into view (respecting reduced-motion),
+  // pause once scrolled away, and each has its own Play/Pause button that overrides the
+  // auto-behavior until the video scrolls out and back into view.
+  (function () {
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var v = entry.target;
+        if (entry.isIntersecting && !(reduced && reduced.matches) && !v.dataset.userPaused) {
+          v.play().catch(function () {});
+        } else {
+          v.pause();
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('.video-wrap video').forEach(function (v) {
+      var b = v.parentElement.querySelector('button');
+      if (!b) return;
+      function sync() {
+        b.textContent = v.paused ? 'Play reel' : 'Pause reel';
+        b.setAttribute('aria-label', (v.paused ? 'Play ' : 'Pause ') + v.getAttribute('aria-label'));
+      }
+      b.addEventListener('click', function () {
+        if (v.paused) { delete v.dataset.userPaused; v.play().catch(function () {}); }
+        else { v.dataset.userPaused = 'true'; v.pause(); }
+      });
+      v.addEventListener('play', sync);
+      v.addEventListener('pause', sync);
+      sync();
+      obs.observe(v);
+    });
+  })();
+
+  // Contact form: validates, then POSTs to Formspree (multipart POST + Accept: application/json).
   (function () {
     var FORM_ENDPOINT = 'https://formspree.io/f/xwlpvokd';
 
@@ -809,95 +495,8 @@
     });
   })();
 
-  // Site menu + compact header.
-  // - Two hamburgers (the hero's own and the one in the fixed header) open the same full-screen
-  //   menu. Its links close it and scroll to their section themselves (smooth, stopping just below
-  //   the header) rather than following the #anchor, so the address bar never picks up #contact
-  //   and a refresh doesn't jump back there. Scroll is locked while the menu is open and Tab
-  //   stays inside it.
-  // - The header is hidden while the hero's own big name is on screen, appears once it has
-  //   scrolled away, and turns solid once the hero is behind it. Its &Liu scrolls back to the top.
-  (function () {
-    var menu = document.getElementById('site-menu');
-    var toggles = [].slice.call(document.querySelectorAll('.menu-toggle'));
-    var closeBtn = menu && menu.querySelector('.menu-close');
-    var header = document.getElementById('site-header');
-    var hero = document.querySelector('.hero-viewport');
-    var heroName = hero && hero.querySelector('.amp');
-    if (!menu || !toggles.length || !closeBtn) return;
-    var links = [].slice.call(menu.querySelectorAll('a'));
-    var focusable = [closeBtn].concat(links);
-    var opener = toggles[0];
-
-    function behavior() {
-      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-    }
-
-    function setOpen(open, returnFocus) {
-      menu.classList.toggle('is-open', open);
-      toggles.forEach(function (t) { t.setAttribute('aria-expanded', open ? 'true' : 'false'); });
-      document.body.style.overflow = open ? 'hidden' : '';
-      if (open) {
-        void menu.offsetWidth; // apply visibility before focusing
-        closeBtn.focus({ preventScroll: true });
-      } else if (returnFocus) {
-        opener.focus({ preventScroll: true });
-      }
-    }
-
-    toggles.forEach(function (t) {
-      t.addEventListener('click', function () { opener = t; setOpen(true); });
-    });
-    closeBtn.addEventListener('click', function () { setOpen(false, true); });
-    links.forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        var id = (a.getAttribute('href') || '').replace('#', '');
-        var target = id && document.getElementById(id);
-        if (!target) return;    // nothing to scroll to: let the browser handle the link
-        e.preventDefault();     // keeps #about / #work / #contact out of the address bar
-        setOpen(false, false);  // also releases the scroll lock
-        requestAnimationFrame(function () {
-          var barH = header ? header.offsetHeight : 0;
-          window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - barH, behavior: behavior() });
-          target.setAttribute('tabindex', '-1');
-          target.focus({ preventScroll: true });
-        });
-      });
-    });
-    document.addEventListener('keydown', function (e) {
-      if (!menu.classList.contains('is-open')) return;
-      if (e.key === 'Escape') { setOpen(false, true); return; }
-      if (e.key !== 'Tab') return;
-      var first = focusable[0], last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    });
-
-    if (!header) return;
-    header.querySelector('.site-logo').addEventListener('click', function (e) {
-      e.preventDefault(); // back to the top without leaving #top in the address bar
-      window.scrollTo({ top: 0, behavior: behavior() });
-    });
-    var ticking = false;
-    function update() {
-      ticking = false;
-      var barH = header.offsetHeight;
-      header.classList.toggle('is-on', !heroName || heroName.getBoundingClientRect().bottom < 6);
-      header.classList.toggle('is-solid', !hero || hero.getBoundingClientRect().bottom <= barH + 8);
-    }
-    function request() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-    window.addEventListener('scroll', request, { passive: true });
-    window.addEventListener('resize', request);
-    window.addEventListener('pageshow', request);
-    update();
-  })();
-
-  // Logo strip on touch screens: there's no hover there, so pressing a logo lights it up (full
-  // color, bubble) and holds the strip still under your finger, the way hover does on a
-  // computer. Lifting your finger sets the strip scrolling again right away, from the same
-  // spot; the logo stays lit for a moment while it drifts off, then settles back to grey.
-  // Dragging (i.e. scrolling the page) cancels it at once. touch events work on any element
-  // in iOS, unlike click, which it drops for taps that only bubble up to document.
+  // Logo strip on touch screens: press-and-hold lights a logo up and holds the strip; release
+  // resumes it. Unchanged from before.
   (function () {
     var track = document.querySelector('.logo-track');
     if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
@@ -908,7 +507,7 @@
       if (lit) lit.classList.remove('is-lit');
       lit = null;
     }
-    function release() { track.classList.remove('is-held'); } // strip scrolls again
+    function release() { track.classList.remove('is-held'); }
     function cancel() { release(); unlight(); }
     function letGo() { release(); clearTimeout(timer); timer = setTimeout(unlight, 1200); }
 
@@ -928,23 +527,21 @@
       if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) cancel();
     }, { passive: true });
     track.addEventListener('touchend', letGo);
-    track.addEventListener('touchcancel', cancel); // the browser took the gesture over to scroll
+    track.addEventListener('touchcancel', cancel);
     document.addEventListener('touchstart', function (e) {
       if (!e.target.closest || !e.target.closest('.logo-track')) cancel();
     }, { passive: true });
   })();
 
-  // Logo strip motion on touch screens. iPhone Safari kept leaving stretches of the strip unpainted
-  // while a CSS animation moved it, so here a small script moves it instead, at the same pace (one
-  // full set of logos every 34s). It only runs while the strip is on screen and the tab is visible,
-  // and it holds still while a finger is on a logo (.is-held, set by the script above).
+  // Logo strip motion on touch screens: a small script moves the track instead of the CSS
+  // animation, since iPhone Safari left stretches of it unpainted otherwise. Unchanged from before.
   (function () {
     var track = document.querySelector('.logo-track');
     if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var SECONDS = 34, period = 0, pos = 0, last = 0, raf = 0, onScreen = true, tabVisible = !document.hidden;
 
-    function measure() { period = track.scrollWidth / 2; } // two identical sets, padded so half is exactly one set
+    function measure() { period = track.scrollWidth / 2; }
     function frame(t) {
       raf = requestAnimationFrame(frame);
       var dt = last ? Math.min(t - last, 64) / 1000 : 0;
@@ -971,9 +568,67 @@
     sync();
   })();
 
-  // Trailing cursor dot: eases toward the real pointer position every frame (the "lag"),
-  // and grows when hovering anything clickable. Skipped for touch devices and for anyone
-  // who's asked for reduced motion, since the whole point of it is motion.
+  // Intro: & fades in, dissolves into a traced rectangle that fills solid white and grows to
+  // exactly cover the hero-wrap block above (not the whole page), then fades away. No scroll
+  // lock anywhere in this -- the rest of the page is reachable and scrollable the entire time,
+  // matching how remotemountain.com's own intro behaves.
+  (function () {
+    var intro = document.getElementById('intro');
+    var heroWrap = document.getElementById('heroWrap');
+    var amp = document.getElementById('introAmp');
+    var traceSvg = document.getElementById('introTrace');
+    var traceRect = document.getElementById('traceRect');
+    var box = document.getElementById('introBox');
+    if (!intro || !heroWrap || !amp || !traceSvg || !traceRect || !box) return;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    async function run() {
+      if (reduced) { intro.classList.add('is-done'); return; }
+      await wait(200);
+      amp.classList.add('is-in');
+      await wait(600);
+
+      var ar = amp.getBoundingClientRect(), hr = intro.getBoundingClientRect();
+      var pad = ar.height * 0.18;
+      var bx = ar.left - hr.left - pad, by = ar.top - hr.top - pad;
+      var bw = ar.width + pad * 2, bh = ar.height + pad * 2;
+
+      traceSvg.style.left = bx + 'px'; traceSvg.style.top = by + 'px';
+      traceSvg.style.width = bw + 'px'; traceSvg.style.height = bh + 'px';
+      traceRect.setAttribute('width', bw); traceRect.setAttribute('height', bh);
+
+      amp.classList.add('is-out');
+      var len = traceRect.getTotalLength();
+      traceRect.style.strokeDasharray = len;
+      traceRect.style.strokeDashoffset = len;
+      traceRect.getBoundingClientRect();
+      traceRect.style.transition = 'stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)';
+      traceRect.style.strokeDashoffset = '0';
+      await wait(550);
+
+      traceSvg.style.display = 'none';
+      box.style.left = bx + 'px'; box.style.top = by + 'px';
+      box.style.width = bw + 'px'; box.style.height = bh + 'px';
+      box.style.display = 'block';
+      await wait(50);
+
+      box.style.transition = 'left .7s cubic-bezier(.22,1,.36,1), top .7s cubic-bezier(.22,1,.36,1), width .7s cubic-bezier(.22,1,.36,1), height .7s cubic-bezier(.22,1,.36,1)';
+      box.style.left = '0px'; box.style.top = '0px';
+      box.style.width = hr.width + 'px'; box.style.height = hr.height + 'px';
+      await wait(750);
+
+      intro.classList.add('is-fading');
+      await wait(550);
+      intro.classList.add('is-done');
+    }
+
+    if (document.readyState === 'complete') run();
+    else window.addEventListener('load', run);
+  })();
+
+  // Trailing cursor dot: unchanged from before.
   (function () {
     var dot = document.querySelector('.cursor-dot');
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
