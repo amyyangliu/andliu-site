@@ -37,7 +37,7 @@
       --bg:     #FFFFFF;  /* page background */
       --ink:    #242424;  /* body text, wordmark */
       --accent: #E2542B;  /* coral -- the one accent color */
-      --dark:   #241E1A;  /* contact band + footer + full-screen menu (unchanged from before) */
+      --dark:   var(--ink);  /* contact band + footer -- same dark grey used everywhere else, not a one-off brown */
       --cream:  #FBEEE6;  /* text on the dark band (unchanged from before) */
 
       --case-ratio: 21/9;
@@ -68,7 +68,7 @@
        ------------------------------------------------------------------ */
     .cursor-dot {
       position: fixed; top: 0; left: 0; width: 22px; height: 22px; border-radius: 50%;
-      background: var(--ink); pointer-events: none; z-index: 9999; opacity: 0;
+      background: #000; pointer-events: none; z-index: 9999; opacity: 0;
       transform: translate(-50%, -50%);
       transition: width .25s ease, height .25s ease, opacity .25s ease;
     }
@@ -159,10 +159,14 @@
        moves from the old yellow band to the new plain white page, and the
        edge fade + "Experience with" label are restyled to match.
        ------------------------------------------------------------------ */
-    .about { padding: 100px var(--gutter); display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; align-items: center; }
+    /* orange band -- .eyebrow is shared with the (dark-background) contact section, where
+       accent-on-dark already reads fine, so its white-on-orange override is scoped to .about
+       specifically rather than changed at the shared rule */
+    .about { background: var(--accent); padding: 100px var(--gutter); display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; align-items: center; }
     .eyebrow { color: var(--accent); margin-bottom: 24px; font-size: 12px; }
-    .about h2 { font-family: 'Italiana', serif; font-weight: 400; font-size: clamp(38px, 5vw, 76px); line-height: 1.05; letter-spacing: -0.01em; margin: 0 0 30px; }
-    .about p { font-size: 18px; line-height: 1.65; max-width: 600px; margin: 0 0 20px; opacity: 0.85; }
+    .about .eyebrow { color: #fff; opacity: 0.85; }
+    .about h2 { font-family: 'Italiana', serif; font-weight: 400; font-size: clamp(38px, 5vw, 76px); line-height: 1.05; letter-spacing: -0.01em; margin: 0 0 30px; color: #fff; }
+    .about p { font-size: 18px; line-height: 1.65; max-width: 600px; margin: 0 0 20px; opacity: 0.85; color: #fff; }
     .portrait { width: 100%; max-height: 540px; object-fit: cover; object-position: center 35%; }
     @media (max-width: 600px) { .about { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; } .about p { font-size: 16px; } .portrait { max-height: 380px; } }
 
@@ -284,7 +288,7 @@
     <h1 class="wordmark" aria-label="&amp;Liu"><span class="amp">&amp;</span>Liu</h1>
     <p class="slogan">Agency caliber work.<span>Without the agency.</span></p>
   </header>
-  <div class="details mono"><div>Los Angeles&ndash;based digital design studio.</div></div>
+  <div class="details mono"><div>A Los Angeles&ndash;based digital design studio.</div></div>
   <p class="statement">Thoughtful websites and distinctive brands.<br>Built around <em>your business.</em></p>
 
   <!-- intro overlay: scoped to this block only via the position:relative wrapper above --
