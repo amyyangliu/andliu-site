@@ -98,31 +98,31 @@
 
     .masthead {
       display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      gap: 24px; padding: 25px var(--gutter) 28px; border-bottom: 1px solid var(--ink);
+      gap: 24px; padding: 20px var(--gutter) 22px; border-bottom: 1px solid var(--ink);
     }
     .wordmark {
-      font-family: 'Italiana', serif; font-size: clamp(84px, 16.5vw, 255px); font-weight: 400;
+      font-family: 'Italiana', serif; font-size: clamp(70px, 13.5vw, 210px); font-weight: 400;
       line-height: 0.91; letter-spacing: -0.065em; margin: 0; white-space: nowrap;
     }
     .wordmark .amp { font-family: 'Marcellus', serif; color: var(--accent); letter-spacing: -0.11em; }
     .slogan {
-      font-size: clamp(16px, 2.75vw, 43px); font-weight: 400; line-height: 1.08; letter-spacing: -0.035em;
-      margin: 18px 0 0; max-width: 52%; text-transform: uppercase;
+      font-size: clamp(14px, 2.3vw, 36px); font-weight: 400; line-height: 1.08; letter-spacing: -0.035em;
+      margin: 15px 0 0; max-width: 52%; text-transform: uppercase;
     }
     .slogan span { display: block; color: var(--accent); }
     @media (max-width: 600px) {
-      .masthead { padding: 22px 16px 28px; gap: 20px; }
-      .wordmark { font-size: 24vw; }
-      .slogan { font-size: 3.65vw; max-width: 51%; letter-spacing: -0.025em; }
+      .masthead { padding: 18px 16px 22px; gap: 20px; }
+      .wordmark { font-size: 20vw; }
+      .slogan { font-size: 3vw; max-width: 51%; letter-spacing: -0.025em; }
     }
 
-    .details { padding: 19px var(--gutter) 0; font-size: 12px; }
+    .details { padding: 16px var(--gutter) 0; font-size: 12px; }
     .statement {
-      font-size: clamp(28px, 3.55vw, 62px); line-height: 1.13; font-weight: 400; letter-spacing: -0.045em;
-      margin: 29px var(--gutter) 46px; max-width: 1450px;
+      font-size: clamp(24px, 3vw, 52px); line-height: 1.13; font-weight: 400; letter-spacing: -0.045em;
+      margin: 24px var(--gutter) 38px; max-width: 1450px;
     }
     .statement em { font-style: normal; color: var(--accent); }
-    @media (max-width: 600px) { .statement { margin: 25px 16px 32px; font-size: 30px; } }
+    @media (max-width: 600px) { .statement { margin: 20px 16px 26px; font-size: 25px; } }
 
     [tabindex="-1"]:focus { outline: none; } /* #contact is focusable but shows no ring */
 
@@ -340,11 +340,11 @@
     @media (max-width: 600px) { .footer { padding: 25px 16px; font-size: 10px; } }
 
     /* Viewport entrance; scrolling remains available throughout. */
-#entrance{position:absolute;left:0;top:0;width:100%;height:100svh;background:#000;z-index:200;pointer-events:none;overflow:hidden}
+#entrance{position:absolute;left:0;top:0;width:100%;height:130svh;background:#000;z-index:200;pointer-events:none;overflow:hidden}
 #entrance[hidden]{display:none}
-#entrance-mark{position:absolute;inset:0;display:grid;place-items:center;font-family:Marcellus,serif;font-size:clamp(100px,14vw,190px);color:#fff;opacity:0;line-height:1}
-#entrance-outline{position:absolute;left:50%;top:50%;width:150px;height:180px;transform:translate(-50%,-50%);overflow:visible}#entrance-outline rect{fill:none;stroke:#fff;stroke-width:1.25;stroke-dasharray:1000;stroke-dashoffset:1000}
-#entrance-white{position:absolute;left:50%;top:50%;width:150px;height:180px;background:#fff;transform:translate(-50%,-50%) scale(.02)}
+#entrance-mark{position:absolute;left:0;top:0;width:100%;height:100svh;display:grid;place-items:center;font-family:Marcellus,serif;font-size:clamp(100px,14vw,190px);color:#fff;opacity:0;line-height:1}
+#entrance-outline{position:absolute;left:50%;top:50svh;width:150px;height:180px;transform:translate(-50%,-50%);overflow:visible}#entrance-outline rect{fill:none;stroke:#fff;stroke-width:1.25;stroke-dasharray:1000;stroke-dashoffset:1000}
+#entrance-white{position:absolute;left:50%;top:50svh;width:150px;height:180px;background:#fff;transform:translate(-50%,-50%) scale(.02)}
 
 @media(prefers-reduced-motion:reduce){#entrance{display:none}}
     @media (prefers-reduced-motion: reduce) {
