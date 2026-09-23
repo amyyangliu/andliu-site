@@ -1000,26 +1000,33 @@ if(!location.hash || location.hash === '#top')play();
     // Five pets earn a tuna snack; taps during the treat cannot stack more drops.
     var pets = 0;
     var tuna = [
-      '..OOOOOOOOOO..', '.ONNNNNNNNNNO.', 'ONMMMMMMMMMMNO',
-      'ONBBBBBBBBBBNO', 'ONBBBBBBBBBBNO', 'ONBBBWWWBBWBNO',
-      'ONBBWWKWWWWBNO', 'ONBBBWWWBBWBNO', 'ONBBBBBBBBBBNO',
-      'ONBBBBBBBBBBNO', 'ONMMMMMMMMMMNO', '.ONNNNNNNNNNO.',
-      '..OOOOOOOOOO..'
+      "......................",
+      "...........O..........",
+      ".........OODOOO.......",
+      ".OO....OOBDDBBBOO.....",
+      "ODDO.OOBBLLLLLLBBOO...",
+      "ODDDOBBBBBBBBBBBBKBO..",
+      ".ODDDBBBBBBBBBDBBBBBO.",
+      "ODDDDBBBBBDBBBDBBBBBO.",
+      "ODDOOODDDDDDDDDDDDDO..",
+      ".OO...OODDDDDDDDDOO...",
+      "........OOODDOOOO.....",
+      "...........OO.........",
+      "......................"
     ];
-    var tunaColors = { O: CREAM, N: PAL.N, M: PAL.M, B: '#737D89', W: '#BFE3F2', K: PAL.K };
+    var tunaColors = { O: CREAM, B: "#A8D9EF", D: "#76AECF", L: "#D7F1FA", K: PAL.K };
     function drawTuna(cx, cy, scale) {
-      var px = 4 * scale;
-      ctx.save();
-      ctx.translate(Math.round(cx), Math.round(cy));
-      ctx.rotate(-Math.PI / 6);
+      if (scale <= 0.02) return;
+      var px = Math.max(1, Math.round(4 * scale));
+      var left = Math.round(cx - tuna[0].length * px / 2);
+      var top = Math.round(cy - tuna.length * px / 2);
       tuna.forEach(function (row, y) {
         row.split('').forEach(function (ch, x) {
           if (ch === '.') return;
           ctx.fillStyle = tunaColors[ch];
-          ctx.fillRect(Math.round((x - 7) * px), Math.round((y - 6.5) * px), Math.ceil(px), Math.ceil(px));
+          ctx.fillRect(left + x * px, top + y * px, px, px);
         });
       });
-      ctx.restore();
     }
 
     stage.addEventListener('click', function (e) {
@@ -1135,12 +1142,12 @@ if(!location.hash || location.hash === '#top')play();
           // Slower fall, a gentle rebound, then a readable hold before the gulp.
           var swallow = Math.max(0, Math.min(1, (t - 1950) / 650));
           var fall = Math.min(t / 1200, 1);
-          var canY = reduceMotion ? mouthY - 40 : -30 + (mouthY - 40 + 30) * fall * fall;
+          var fishY = reduceMotion ? mouthY - 40 : -30 + (mouthY - 40 + 30) * fall * fall;
           if (!reduceMotion && t >= 1200 && t < 1550) {
-            canY -= Math.sin(Math.PI * (t - 1200) / 350) * 12;
+            fishY -= Math.sin(Math.PI * (t - 1200) / 350) * 12;
           }
-          canY += 40 * ease(swallow);
-          drawTuna(mouthX, canY, 1 - ease(swallow));
+          fishY += 40 * ease(swallow);
+          drawTuna(mouthX, fishY, 1 - ease(swallow));
         }
       }
     }
