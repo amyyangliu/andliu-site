@@ -97,7 +97,7 @@
     }
 
     .masthead {
-      display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
       gap: 24px; padding: 25px var(--gutter) 28px; border-bottom: 1px solid var(--ink);
     }
     .wordmark {
@@ -193,35 +193,32 @@
     .logo-item[data-logo="samsung"]          { --logo-scale: 0.88; }
     .logo-item[data-logo="underarmour"]      { --logo-scale: 1.5; }
     .logo-item[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
-    /* Each logo also drifts up and down in a long sine wave as the row scrolls -- a separate
-       transform on .logo-item itself (never .logo-flip, which owns the rotateY flip), so the two
-       motions never compete. Period = 8s, per-logo delay step = 1s: 8 logos x 1s = exactly one
-       period, so the wave is exactly one full cycle wide and loops across the marquee's
-       DOM-duplication seam with zero discontinuity. --logo-i is redeclared here (rather than
-       reused from .logo-flip below) because custom properties don't cascade upward from a child
-       to its own ancestor. */
+    /* Each logo also hops up and down in a quick arcade-sprite pop as the row scrolls -- a
+       separate transform on .logo-item itself (never .logo-flip, which owns the rotateY flip),
+       so the two motions never compete. Each hop is brief (a fast ease-out launch, a beat of
+       hang time at the peak, a fast ease-in fall), then rests for most of the cycle -- a snappy
+       jump, not a smooth drift. Staggered via --logo-i at a step shorter than one hop's active
+       window, so several logos are mid-hop at any instant and it reads as a wave of hops
+       cascading across the row rather than a single logo popping at a time. --logo-i is
+       redeclared here (rather than reused from .logo-flip below) because custom properties
+       don't cascade upward from a child to its own ancestor. */
     .logo-item {
-      animation: logoWaveBob 8s linear infinite;
-      animation-delay: calc(var(--logo-i, 0) * -1s);
+      animation: logoWaveBob 2s linear infinite;
+      animation-delay: calc(var(--logo-i, 0) * -0.25s);
     }
     .logo-item[data-logo="hm"]               { --logo-i: 0; }
     .logo-item[data-logo="unilever"]         { --logo-i: 1; }
     .logo-item[data-logo="heineken"]         { --logo-i: 2; }
     .logo-item[data-logo="samsung"]          { --logo-i: 3; }
     .logo-item[data-logo="amgen"]            { --logo-i: 4; }
-    .logo-item[data-logo="shiseido"]         { --logo-i: 5; }
     .logo-item[data-logo="underarmour"]      { --logo-i: 6; }
     .logo-item[data-logo="frieslandcampina"] { --logo-i: 7; }
     @keyframes logoWaveBob {
-      0%    { transform: translateY(0); }
-      12.5% { transform: translateY(-25px); }
-      25%   { transform: translateY(-36px); }
-      37.5% { transform: translateY(-25px); }
-      50%   { transform: translateY(0); }
-      62.5% { transform: translateY(25px); }
-      75%   { transform: translateY(36px); }
-      87.5% { transform: translateY(25px); }
-      100%  { transform: translateY(0); }
+      0%   { transform: translateY(0);     animation-timing-function: cubic-bezier(.3,.9,.4,1); }
+      16%  { transform: translateY(-36px); animation-timing-function: linear; }
+      22%  { transform: translateY(-36px); animation-timing-function: cubic-bezier(.7,0,.84,.32); }
+      40%  { transform: translateY(0); }
+      100% { transform: translateY(0); }
     }
     /* Each logo is a 3D card: a grey face forward, its true-color face on the back (pre-rotated
        so it faces the right way once the card turns). It flips on its own, on a loop, staggered
@@ -244,7 +241,6 @@
     .logo-item[data-logo="heineken"]         .logo-flip { --logo-i: 2; }
     .logo-item[data-logo="samsung"]          .logo-flip { --logo-i: 3; }
     .logo-item[data-logo="amgen"]            .logo-flip { --logo-i: 4; }
-    .logo-item[data-logo="shiseido"]         .logo-flip { --logo-i: 5; }
     .logo-item[data-logo="underarmour"]      .logo-flip { --logo-i: 6; }
     .logo-item[data-logo="frieslandcampina"] .logo-flip { --logo-i: 7; }
     @keyframes logoAutoFlip {
@@ -405,7 +401,6 @@
         <span class="logo-item" data-logo="heineken"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt="Heineken"></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt="" aria-hidden="true"></span></span></span>
         <span class="logo-item" data-logo="samsung"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt="Samsung"></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt="" aria-hidden="true"></span></span></span>
         <span class="logo-item" data-logo="amgen"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt="Amgen"></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="shiseido"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/shiseido.png" alt="Shiseido"></span><span class="logo-face logo-face--color"><img src="images/logos/shiseido.svg" alt="" aria-hidden="true"></span></span></span>
         <span class="logo-item" data-logo="underarmour"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/underarmour.png" alt="Under Armour"></span><span class="logo-face logo-face--color"><img src="images/logos/underarmour.svg" alt="" aria-hidden="true"></span></span></span>
         <span class="logo-item" data-logo="frieslandcampina"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/frieslandcampina.png" alt="FrieslandCampina"></span><span class="logo-face logo-face--color"><img src="images/logos/frieslandcampina.png" alt="" aria-hidden="true"></span></span></span>
         <span class="logo-item" data-logo="hm" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/hm.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/hm.svg" alt=""></span></span></span>
@@ -413,7 +408,6 @@
         <span class="logo-item" data-logo="heineken" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt=""></span></span></span>
         <span class="logo-item" data-logo="samsung" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt=""></span></span></span>
         <span class="logo-item" data-logo="amgen" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="shiseido" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/shiseido.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/shiseido.svg" alt=""></span></span></span>
         <span class="logo-item" data-logo="underarmour" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/underarmour.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/underarmour.svg" alt=""></span></span></span>
         <span class="logo-item" data-logo="frieslandcampina" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/frieslandcampina.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/frieslandcampina.png" alt=""></span></span></span>
       </div>
