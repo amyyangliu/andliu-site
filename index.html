@@ -969,8 +969,8 @@ if(!location.hash || location.hash === '#top')play();
       stage.appendChild(el);
       setTimeout(function () { el.remove(); }, 1900);
     }
-    function floatSprite(name, fx) {
-      var sp = SPRITES[name], px = 3, el = document.createElement('canvas');
+    function floatSprite(name, fx, pixelSize) {
+      var sp = SPRITES[name], px = pixelSize || 3, el = document.createElement('canvas');
       el.width = sp.r[0].length * px; el.height = sp.r.length * px;
       var x2 = el.getContext('2d');
       sp.r.forEach(function (rw, y) { rw.split('').forEach(function (ch, x) {
@@ -986,10 +986,41 @@ if(!location.hash || location.hash === '#top')play();
       place(el, fx == null ? 0.15 + Math.random() * 0.5 : fx, 60);
     }
 
+    // Ten pets earn a tuna snack; taps during the treat cannot stack more drops.
+    var pets = 0;
+    var tuna = [
+      '..OOOOOOOOOO..', '.ONNNNNNNNNNO.', 'ONMMMMMMMMMMNO',
+      'ONBBBBBBBBBBNO', 'ONBBBBBBBBBBNO', 'ONBBBWWWBBWBNO',
+      'ONBBWWKWWWWBNO', 'ONBBBWWWBBWBNO', 'ONBBBBBBBBBBNO',
+      'ONBBBBBBBBBBNO', 'ONMMMMMMMMMMNO', '.ONNNNNNNNNNO.',
+      '..OOOOOOOOOO..'
+    ];
+    var tunaColors = { O: CREAM, N: PAL.N, M: PAL.M, B: '#737D89', W: '#BFE3F2', K: PAL.K };
+    function drawTuna(cx, cy, scale) {
+      var px = 4 * scale;
+      ctx.save();
+      ctx.translate(Math.round(cx), Math.round(cy));
+      ctx.rotate(-Math.PI / 6);
+      tuna.forEach(function (row, y) {
+        row.split('').forEach(function (ch, x) {
+          if (ch === '.') return;
+          ctx.fillStyle = tunaColors[ch];
+          ctx.fillRect(Math.round((x - 7) * px), Math.round((y - 6.5) * px), Math.ceil(px), Math.ceil(px));
+        });
+      });
+      ctx.restore();
+    }
+
     stage.addEventListener('click', function (e) {
       var b = stage.getBoundingClientRect(), h = home();
       var x = e.clientX - b.left, y = e.clientY - b.top;
-      if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) floatSprite('heart', 0.41);
+      if (e.target.closest('a, input, textarea, select, button')) return;
+      if (phase !== 'code' || !visible) return;
+      if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) {
+        pets++;
+        floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7));
+        if (pets >= 10) { pets = 0; phase = 'feed'; t = 0; }
+      }
     });
 
     // the show
@@ -1034,6 +1065,13 @@ if(!location.hash || location.hash === '#top')play();
       } else if (phase === 'laptop') {
         grid = body(tail); shades = true; lap = Math.min(t / 250, 1); paws = { L: 'down', R: 'down' };
         if (t >= 350) { phase = 'code'; t = 0; codeStart = now; }
+      } else if (phase === 'feed') {
+        grid = body(tail); shades = true; lap = 1;
+        paws = { L: 'down', R: 'down' };
+        if (t >= 3000) {
+          floatSprite('heart', 0.41, 8);
+          phase = 'code'; t = 0; codeStart = now; lastPop = now;
+        }
       } else {
         grid = body(tail); shades = true; lap = 1;
         var ct = (now - codeStart) % CYCLE;
@@ -1066,6 +1104,32 @@ if(!location.hash || location.hash === '#top')play();
         if (gy < -S) drawCells(rim, ox, gyy, CREAM);
         drawCells(glasses, ox, gyy, '#111111');
         if (glint) { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(ox + 8 * S, gyy + 7 * S, S, S); ctx.fillRect(ox + 16 * S, gyy + 7 * S, S, S); }
+      }
+      if (phase === 'feed') {
+        var mouthX = ox + 14 * S, mouthY = oy + 11 * S;
+        // Two curved lobes meet at a raised center: a pixel cat smile / gulp.
+        if (t >= 1800) {
+          var opening = Math.max(0, Math.min(1, (t - 1800) / 220)) *
+            Math.max(0, Math.min(1, (2770 - t) / 220));
+          var lip = [0, 1, 1, 0, -1, 0, 1, 1, 0];
+          ctx.fillStyle = PAL.K;
+          lip.forEach(function (level, col) {
+            var depth = Math.round(6 * opening * (1 - Math.abs(col - 4) / 5));
+            ctx.fillRect(Math.round(mouthX + (col - 4.5) * 3),
+              mouthY - 3 + level * 2 - Math.round(opening * 2), 3, 2 + depth);
+          });
+        }
+        if (t < 2600) {
+          // Slower fall, a gentle rebound, then a readable hold before the gulp.
+          var swallow = Math.max(0, Math.min(1, (t - 1950) / 650));
+          var fall = Math.min(t / 1200, 1);
+          var canY = reduceMotion ? mouthY - 40 : -30 + (mouthY - 40 + 30) * fall * fall;
+          if (!reduceMotion && t >= 1200 && t < 1550) {
+            canY -= Math.sin(Math.PI * (t - 1200) / 350) * 12;
+          }
+          canY += 40 * ease(swallow);
+          drawTuna(mouthX, canY, 1 - ease(swallow));
+        }
       }
     }
     requestAnimationFrame(loop);
