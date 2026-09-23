@@ -340,7 +340,7 @@
     @media (max-width: 600px) { .footer { padding: 25px 16px; font-size: 10px; } }
 
     /* Viewport entrance; scrolling remains available throughout. */
-#entrance{position:fixed;left:0;top:0;width:100%;height:100svh;background:#000;z-index:200;pointer-events:none;overflow:hidden}
+#entrance{position:absolute;left:0;top:0;width:100%;height:100svh;background:#000;z-index:200;pointer-events:none;overflow:hidden}
 #entrance[hidden]{display:none}
 #entrance-mark{position:absolute;inset:0;display:grid;place-items:center;font-family:Marcellus,serif;font-size:clamp(100px,14vw,190px);color:#fff;opacity:0;line-height:1}
 #entrance-outline{position:absolute;left:50%;top:50%;width:150px;height:180px;transform:translate(-50%,-50%);overflow:visible}#entrance-outline rect{fill:none;stroke:#fff;stroke-width:1.25;stroke-dasharray:1000;stroke-dashoffset:1000}
@@ -858,7 +858,7 @@ if(!location.hash || location.hash === '#top')play();
 </script>
 
 <script>
-  // CODING CAT -- paces, sits, sunglasses drop in, laptop pops up, then types forever
+  // CODING CAT -- enters from the left, settles, puts on sunglasses, then types forever
   // while hearts / sparkles / bubbles / "shipped" / "diva" float up. Click it for a heart.
   (function () {
     var stage = document.getElementById('contact');
@@ -946,7 +946,6 @@ if(!location.hash || location.hash === '#top')play();
         y: Math.round(spot.bottom - b.top - H * S)
       };
     }
-    function paceScale() { return Math.max(0, Math.min(1, ((perch.clientWidth - W * S) / 2 - 10) / 55)); }
 
     function drawGrid(g, ox, oy) {
       g.forEach(function (rw, y) { rw.forEach(function (ch, x) {
@@ -995,9 +994,9 @@ if(!location.hash || location.hash === '#top')play();
 
     // the show
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var PACE = [0, -55, 0], SPEED = 110, CYCLE = 9000;
+    var WALK_MS = 1500, CYCLE = 9000;
     var goodies = ['heart', 'sparkle', 'bubble', 'heart', 'sparkle', 'bubble', 'shipped', 'diva'];
-    var phase = reduceMotion ? 'code' : 'pace', t = 0, catX = 0, paceIdx = 0, turnPause = 0;
+    var phase = reduceMotion ? 'code' : 'walk', t = 0, catX = 0;
     var codeStart = performance.now(), lastPop = 0, cheered = false, started = false, visible = false;
     function ease(p) { return p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
 
@@ -1011,35 +1010,30 @@ if(!location.hash || location.hash === '#top')play();
       ctx.clearRect(0, 0, cv.width, cv.height);
       var grid, bob = 0, shades = false, gy = 0, lap = 0, paws = null, glint = false;
 
-      if (phase === 'pace') {
-        if (!started || turnPause > 0) { if (started) turnPause -= dt; grid = body(tail); }
-        else {
-          var target = PACE[paceIdx + 1] * paceScale();
-          var dir = Math.sign(target - catX);
-          catX += dir * SPEED * dt / 1000;
-          if ((dir > 0 && catX >= target) || (dir < 0 && catX <= target) || dir === 0) {
-            catX = target; paceIdx++; turnPause = 150;
-            if (paceIdx >= PACE.length - 1) { phase = 'sit'; t = 0; }
-          }
-          var step = Math.floor(now / 150) % 4;
-          grid = body(tail, step === 1 ? 'noLeft' : step === 3 ? 'noRight' : 'both');
-          bob = (step === 1 || step === 3) ? -S : 0;
-        }
+      if (phase === 'walk') {
+        // Enter through the section's clipped left edge, never across the form.
+        // Travel mostly steadily, then ease to a stop at the existing centered perch.
+        var progress = Math.min(t / WALK_MS, 1);
+        var travel = 1 - Math.pow(1 - progress, 1.4);
+        catX = (-W * S - h.x) * (1 - travel);
+        var step = Math.floor(t / 140) % 4;
+        grid = body(tail, step === 1 ? 'noLeft' : step === 3 ? 'noRight' : 'both');
+        bob = progress < .9 && (step === 1 || step === 3) ? -S : 0;
+        if (progress === 1) { catX = 0; phase = 'sit'; t = 0; }
       } else if (phase === 'sit') {
-        grid = body(tail); bob = t < 150 ? S : 0;
-        if (t > 350) { phase = 'glasses'; t = 0; }
+        grid = body(tail);
+        // A small downward plop, recovery, then a quiet beat before the shades.
+        bob = t < 180 ? Math.sin(Math.PI * t / 180) * S : 0;
+        if (t >= 300) { phase = 'glasses'; t = 0; }
       } else if (phase === 'glasses') {
         grid = body(tail); shades = true;
-        if (t < 1300) gy = -(h.y + 10 * S) * (1 - ease(t / 1300));
-        else if (t < 1600) gy = -Math.sin(Math.PI * (t - 1300) / 300) * S * 1.2;
-        else {
-          glint = true;
-          if (t < 1650) floatSprite('sparkle', 0.25);
-          if (t > 2100) { phase = 'laptop'; t = 0; }
-        }
+        if (t < 450) gy = -(h.y + 10 * S) * (1 - ease(t / 450));
+        else if (t < 570) gy = -Math.sin(Math.PI * (t - 450) / 120) * S;
+        else glint = true;
+        if (t >= 650) { phase = 'laptop'; t = 0; }
       } else if (phase === 'laptop') {
-        grid = body(tail); shades = true; lap = Math.min(t / 450, 1); paws = { L: 'down', R: 'down' };
-        if (t > 700) { phase = 'code'; t = 0; codeStart = now; }
+        grid = body(tail); shades = true; lap = Math.min(t / 250, 1); paws = { L: 'down', R: 'down' };
+        if (t >= 350) { phase = 'code'; t = 0; codeStart = now; }
       } else {
         grid = body(tail); shades = true; lap = 1;
         var ct = (now - codeStart) % CYCLE;
