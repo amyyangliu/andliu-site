@@ -993,8 +993,12 @@ if(!location.hash || location.hash === '#top')play();
       place(el, fx == null ? 0.15 + Math.random() * 0.5 : fx, 60);
     }
 
-    // Ten pets earn a tuna snack; taps during the treat cannot stack more drops.
-    var pets = 0;
+    // A visitor's very first tuna snack only takes 5 pets; every one after that takes 10.
+    // Persisted via localStorage so it survives reloads -- if storage is unavailable
+    // (private mode, blocked), fedBefore stays true so it never gets stuck on easy mode.
+    // Taps during the treat cannot stack more drops.
+    var pets = 0, fedBefore = true;
+    try { fedBefore = localStorage.getItem('catFedBefore') === '1'; } catch (e) {}
     var tuna = [
       '..OOOOOOOOOO..', '.ONNNNNNNNNNO.', 'ONMMMMMMMMMMNO',
       'ONBBBBBBBBBBNO', 'ONBBBBBBBBBBNO', 'ONBBBWWWBBWBNO',
@@ -1026,7 +1030,10 @@ if(!location.hash || location.hash === '#top')play();
       if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) {
         pets++;
         floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7), RAINBOW[(pets - 1) % RAINBOW.length]);
-        if (pets >= 10) { pets = 0; phase = 'feed'; t = 0; }
+        if (pets >= (fedBefore ? 10 : 5)) {
+          pets = 0; phase = 'feed'; t = 0;
+          if (!fedBefore) { fedBefore = true; try { localStorage.setItem('catFedBefore', '1'); } catch (e) {} }
+        }
       }
     });
 
