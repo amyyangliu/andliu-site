@@ -325,7 +325,24 @@
     .contact { position: relative; overflow: hidden; }
     .contact-intro { align-self: start; }
     .contact-intro > p { margin-bottom: 0; }
-    .cat-perch { height: 152px; max-width: 410px; margin-top: 8px; }
+    .cat-perch { height: 152px; max-width: 410px; margin-top: 8px; position: relative; }
+    /* A little "don't feed cat" sign to the right of the cat's spot -- board tilted like it's
+       stuck crookedly in the ground, with a small tuft of grass at its base. */
+    .cat-sign { position: absolute; right: 22px; bottom: 0; width: 44px; display: flex; flex-direction: column; align-items: center; }
+    .cat-sign-board {
+      background: #A9754A; border: 1.5px solid #6E4A2A; border-radius: 2px;
+      color: #FBEEE6; font-family: 'Space Mono', monospace; font-weight: 700;
+      font-size: 8px; line-height: 1.35; letter-spacing: 0.02em;
+      text-align: center; text-transform: uppercase; white-space: nowrap;
+      padding: 4px 5px; box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.28);
+      transform: rotate(-5deg);
+    }
+    .cat-sign-post { width: 3px; height: 22px; background: #6E4A2A; transform: rotate(-5deg); margin-top: -2px; }
+    .cat-sign-grass { position: relative; width: 30px; height: 10px; margin-top: -3px; }
+    .cat-sign-grass span { position: absolute; bottom: 0; width: 5px; height: 12px; background: #6FAE4E; border-radius: 6px 6px 0 0; }
+    .cat-sign-grass span:nth-child(1) { left: 2px; height: 12px; transform: rotate(-16deg); background: #5E9B41; }
+    .cat-sign-grass span:nth-child(2) { left: 12px; height: 15px; transform: rotate(4deg); }
+    .cat-sign-grass span:nth-child(3) { left: 21px; height: 11px; transform: rotate(18deg); background: #7FBE5C; }
     .contact > div, .contact > form { position: relative; z-index: 1; }
     .cat-scene { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; z-index: 0; }
     .contact > .cat-float { position: absolute; pointer-events: none; white-space: nowrap; z-index: 2; image-rendering: pixelated; animation: cat-rise 1.8s ease-out forwards; }
@@ -535,7 +552,13 @@
       <div class="eyebrow mono">Have something in mind?</div>
       <h2>Let&rsquo;s build<br>something.</h2>
       <p>Tell me a little about your project. I read every message and reply within two business days.</p>
-      <div class="cat-perch" aria-hidden="true"></div>
+      <div class="cat-perch" aria-hidden="true">
+        <div class="cat-sign">
+          <div class="cat-sign-board">Don&rsquo;t<br>feed<br>cat</div>
+          <div class="cat-sign-post"></div>
+          <div class="cat-sign-grass"><span></span><span></span><span></span></div>
+        </div>
+      </div>
     </div>
     <form id="contact-form" novalidate>
       <label class="contact-field"><span>Name</span><input type="text" name="name" autocomplete="name" required></label>
@@ -993,12 +1016,8 @@ if(!location.hash || location.hash === '#top')play();
       place(el, fx == null ? 0.15 + Math.random() * 0.5 : fx, 60);
     }
 
-    // A visitor's very first tuna snack only takes 5 pets; every one after that takes 10.
-    // Persisted via localStorage so it survives reloads -- if storage is unavailable
-    // (private mode, blocked), fedBefore stays true so it never gets stuck on easy mode.
-    // Taps during the treat cannot stack more drops.
-    var pets = 0, fedBefore = true;
-    try { fedBefore = localStorage.getItem('catFedBefore') === '1'; } catch (e) {}
+    // Five pets earn a tuna snack; taps during the treat cannot stack more drops.
+    var pets = 0;
     var tuna = [
       '..OOOOOOOOOO..', '.ONNNNNNNNNNO.', 'ONMMMMMMMMMMNO',
       'ONBBBBBBBBBBNO', 'ONBBBBBBBBBBNO', 'ONBBBWWWBBWBNO',
@@ -1030,10 +1049,7 @@ if(!location.hash || location.hash === '#top')play();
       if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) {
         pets++;
         floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7), RAINBOW[(pets - 1) % RAINBOW.length]);
-        if (pets >= (fedBefore ? 10 : 5)) {
-          pets = 0; phase = 'feed'; t = 0;
-          if (!fedBefore) { fedBefore = true; try { localStorage.setItem('catFedBefore', '1'); } catch (e) {} }
-        }
+        if (pets >= 5) { pets = 0; phase = 'feed'; t = 0; }
       }
     });
 
