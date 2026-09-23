@@ -319,11 +319,13 @@
     @media (max-width: 600px) { .contact { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; scroll-margin-top: 16px; } }
 
     /* ------------------------------------------------------------------
-       CODING CAT -- pixel pet that paces along the bottom of the contact
-       band, gets its sunglasses from the sky, then "codes" on a laptop.
+       CODING CAT -- pixel pet beneath the contact introduction, gets its sunglasses from the sky, then "codes" on a laptop.
        Drawn on a canvas that sits behind the contact content.
        ------------------------------------------------------------------ */
-    .contact { position: relative; overflow: hidden; padding-bottom: 170px; }
+    .contact { position: relative; overflow: hidden; }
+    .contact-intro { align-self: start; }
+    .contact-intro > p { margin-bottom: 0; }
+    .cat-perch { height: 152px; max-width: 410px; margin-top: 8px; }
     .contact > div, .contact > form { position: relative; z-index: 1; }
     .cat-scene { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; z-index: 0; }
     .contact > .cat-float { position: absolute; pointer-events: none; white-space: nowrap; z-index: 2; image-rendering: pixelated; animation: cat-rise 1.8s ease-out forwards; }
@@ -331,9 +333,8 @@
     @keyframes cat-rise {
       0%   { transform: translateY(0) scale(.6); opacity: 0; }
       15%  { opacity: 1; }
-      100% { transform: translateY(-70px) scale(1); opacity: 0; }
+      100% { transform: translateY(-40px) scale(1); opacity: 0; }
     }
-    @media (max-width: 600px) { .contact { padding-bottom: 160px; } }
 
     .footer { display: flex; justify-content: space-between; padding: 30px var(--gutter); background: var(--dark); color: #c4b7ac; font-size: 11px; }
     @media (max-width: 600px) { .footer { padding: 25px 16px; font-size: 10px; } }
@@ -352,6 +353,43 @@
       .logo-item { animation: none; }
       .logo-item:hover .logo-flip, .logo-item.is-lit .logo-flip { transition: none; }
       html { scroll-behavior: auto; }
+    }
+    /* SERVICES: selected work leads into offers, followed by Amy’s introduction. */
+    .offer { padding: 100px var(--gutter) 110px; background: var(--dark); color: var(--cream); border-top: 1px solid var(--dark); }
+    .offer p { color: #ddd3cb; }
+    .offer a:focus-visible { outline-color: var(--cream); }
+    .offer-kicker { font-size: 12px; margin: 0 0 28px; }
+    .offer-header { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 7vw; align-items: end; padding-bottom: 72px; }
+    .offer h2, .offer h3 { font-family: 'Marcellus', serif; font-weight: 400; letter-spacing: -0.025em; }
+    .offer h2 { font-size: clamp(46px, 6.2vw, 94px); line-height: 1.1; margin: 0; max-width: 920px; }
+    .offer-header p { font-size: clamp(18px, 1.7vw, 25px); line-height: 1.48; margin: 0 0 5px; max-width: 460px; }
+    .offer-row { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 6vw; align-items: center; border-top: 1px solid #82756c; padding: 42px 0; }
+    .offer-row--reverse { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+    .offer-row--reverse .offer-copy { order: 2; }
+    .offer-row--reverse .offer-image { order: 1; }
+    .offer-copy { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; }
+    .offer-label { font-size: 12px; display: flex; align-items: center; gap: 10px; }
+    .offer-label::before { content: ''; display: inline-block; width: 8px; height: 8px; background: var(--accent); }
+    .offer h3 { font-size: clamp(36px, 4.1vw, 64px); line-height: 1.1; margin: 26px 0 22px; }
+    .offer-copy p { font-size: 17px; line-height: 1.62; max-width: 490px; margin: 0 0 8px; }
+    .offer-image { margin: 0; aspect-ratio: 2.1; overflow: hidden; background: #f0f0f0; }
+    .offer-image img { width: 100%; height: 100%; object-fit: cover; }
+    .offer-row--complete { padding: 56px 0; }
+    .offer-row--complete .offer-image { aspect-ratio: 16 / 9; }
+    .offer-bottom { border-top: 1px solid #82756c; display: flex; justify-content: space-between; align-items: end; gap: 40px; padding-top: 40px; }
+    .offer-bottom h3 { font-size: clamp(34px, 3.8vw, 58px); line-height: 1.1; max-width: 630px; margin: 0; }
+    .offer-bottom p { max-width: 410px; font-size: 17px; line-height: 1.6; margin: 0; }
+    .offer-bottom a { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
+    @media (max-width: 700px) {
+      .offer { padding: 68px 16px 72px; }
+      .offer-header, .offer-row, .offer-row--reverse, .offer-row--complete { grid-template-columns: 1fr; gap: 26px; }
+      .offer-header { padding-bottom: 45px; }
+      .offer-row { padding: 30px 0 36px; }
+      .offer-row--reverse .offer-copy, .offer-row--reverse .offer-image { order: initial; }
+      .offer h3 { margin: 22px 0 16px; }
+      .offer-image { aspect-ratio: 2.1; }
+      .offer-bottom { display: block; }
+      .offer-bottom p { margin-top: 20px; }
     }
   </style>
 </head>
@@ -415,6 +453,49 @@
 
   </div>
 
+  <section class="offer" id="offer" aria-label="What we can build together">
+    <div class="offer-kicker mono">What we can build together / &amp;Liu</div>
+    <div class="offer-header">
+      <h2>Look the part.<br>Make your point.</h2>
+      <p>I work directly with founders and business owners to create the identity and website their next chapter needs.</p>
+    </div>
+    <div class="offer-row">
+      <div class="offer-copy">
+        <span class="offer-label mono">01 / Website design</span>
+        <div>
+          <h3>A website that makes your business easy to understand.</h3>
+          <p>Clear structure, considered visuals, and a compelling story help the right people see what you do—and know what to do next.</p>
+        </div>
+      </div>
+      <figure class="offer-image"><img src="images/okie-media-site-still.jpg" alt="Okie Media website designed by &amp;Liu Studio" loading="lazy"></figure>
+    </div>
+    <div class="offer-row offer-row--reverse">
+      <div class="offer-copy">
+        <span class="offer-label mono">02 / Brand identity</span>
+        <div>
+          <h3>An identity that feels like the business you’ve become.</h3>
+          <p>A distinctive visual direction gives everything you put into the world a more confident, consistent presence.</p>
+        </div>
+      </div>
+      <figure class="offer-image"><img src="images/wease-site-still.jpg" alt="WEASE brand and website work by &amp;Liu Studio" loading="lazy"></figure>
+    </div>
+    <div class="offer-row offer-row--complete">
+      <div class="offer-copy">
+        <span class="offer-label mono">03 / Complete brand &amp; website transformation</span>
+        <div>
+          <h3>Show up as the business you’re ready to become.</h3>
+          <p>Your identity and website, designed together around your business, your values, and the clients you want to reach.</p>
+          <p>A complete transformation that brings the quality of your work into focus, helps you attract better-fit clients, and gives you the confidence to pursue bigger opportunities. It feels like you—at your best.</p>
+        </div>
+      </div>
+      <figure class="offer-image"><img src="images/samsung-transformation.jpg" alt="Samsung SmartThings website shown on desktop and tablet" width="1920" height="1080" loading="lazy"></figure>
+    </div>
+    <div class="offer-bottom">
+      <h3>A thoughtful handoff.<br>Confidence to take it from here.</h3>
+      <p>I’ll hand over your files, walk you through the finished work, and show you how to make simple text and image updates to your site. You’ll feel confident taking it from here. <a href="#contact">Tell me what you’re building ↗</a></p>
+    </div>
+  </section>
+
   <section class="about" id="about">
     <div>
       <div class="eyebrow mono">The person behind the studio</div>
@@ -449,10 +530,11 @@
 
   <section class="contact" id="contact" tabindex="-1">
     <canvas class="cat-scene" aria-hidden="true"></canvas>
-    <div>
+    <div class="contact-intro">
       <div class="eyebrow mono">Have something in mind?</div>
       <h2>Let&rsquo;s build<br>something.</h2>
       <p>Tell me a little about your project. I read every message and reply within two business days.</p>
+      <div class="cat-perch" aria-hidden="true"></div>
     </div>
     <form id="contact-form" novalidate>
       <label class="contact-field"><span>Name</span><input type="text" name="name" autocomplete="name" required></label>
@@ -781,7 +863,8 @@ if(!location.hash || location.hash === '#top')play();
   (function () {
     var stage = document.getElementById('contact');
     var cv = stage && stage.querySelector('.cat-scene');
-    if (!cv || !cv.getContext) return;
+    var perch = stage && stage.querySelector('.cat-perch');
+    if (!cv || !cv.getContext || !perch) return;
     var ctx = cv.getContext('2d');
 
     var S = 5, W = 34, H = 24;
@@ -856,13 +939,14 @@ if(!location.hash || location.hash === '#top')play();
     window.addEventListener('resize', resize);
     if ('ResizeObserver' in window) new ResizeObserver(resize).observe(stage);
 
-    function mobile() { return cv.width < 700; }
     function home() {
-      var w = cv.width;
-      var x = mobile() ? (w - W * S) / 2 : Math.max(parseFloat(getComputedStyle(stage).paddingLeft) + 150, w * 0.18);
-      return { x: Math.round(x), y: cv.height - (H - 1) * S };
+      var b = stage.getBoundingClientRect(), spot = perch.getBoundingClientRect();
+      return {
+        x: Math.round(spot.left - b.left + (spot.width - W * S) / 2),
+        y: Math.round(spot.bottom - b.top - H * S)
+      };
     }
-    function paceScale() { return mobile() ? Math.min(1, ((cv.width - W * S) / 2 - 10) / 140) : 1; }
+    function paceScale() { return Math.max(0, Math.min(1, ((perch.clientWidth - W * S) / 2 - 10) / 55)); }
 
     function drawGrid(g, ox, oy) {
       g.forEach(function (rw, y) { rw.forEach(function (ch, x) {
@@ -906,12 +990,12 @@ if(!location.hash || location.hash === '#top')play();
     stage.addEventListener('click', function (e) {
       var b = stage.getBoundingClientRect(), h = home();
       var x = e.clientX - b.left, y = e.clientY - b.top;
-      if (x > h.x + catX && x < h.x + catX + W * S && y > h.y) floatSprite('heart', 0.41);
+      if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) floatSprite('heart', 0.41);
     });
 
     // the show
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var PACE = [0, -140, 60, -90, 0], SPEED = 110, CYCLE = 9000;
+    var PACE = [0, -55, 0], SPEED = 110, CYCLE = 9000;
     var goodies = ['heart', 'sparkle', 'bubble', 'heart', 'sparkle', 'bubble', 'shipped', 'diva'];
     var phase = reduceMotion ? 'code' : 'pace', t = 0, catX = 0, paceIdx = 0, turnPause = 0;
     var codeStart = performance.now(), lastPop = 0, cheered = false, started = false, visible = false;
@@ -934,7 +1018,7 @@ if(!location.hash || location.hash === '#top')play();
           var dir = Math.sign(target - catX);
           catX += dir * SPEED * dt / 1000;
           if ((dir > 0 && catX >= target) || (dir < 0 && catX <= target) || dir === 0) {
-            catX = target; paceIdx++; turnPause = 280;
+            catX = target; paceIdx++; turnPause = 150;
             if (paceIdx >= PACE.length - 1) { phase = 'sit'; t = 0; }
           }
           var step = Math.floor(now / 150) % 4;
@@ -943,7 +1027,7 @@ if(!location.hash || location.hash === '#top')play();
         }
       } else if (phase === 'sit') {
         grid = body(tail); bob = t < 150 ? S : 0;
-        if (t > 700) { phase = 'glasses'; t = 0; }
+        if (t > 350) { phase = 'glasses'; t = 0; }
       } else if (phase === 'glasses') {
         grid = body(tail); shades = true;
         if (t < 1300) gy = -(h.y + 10 * S) * (1 - ease(t / 1300));
@@ -992,19 +1076,14 @@ if(!location.hash || location.hash === '#top')play();
     }
     requestAnimationFrame(loop);
 
-    // draw only while the contact band is on screen; start the routine once its bottom is in view
+    // Start when the cat's own space is visible, including above the form on mobile.
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(stage);
-      new IntersectionObserver(function (e) {
-        e.forEach(function (en) {
-          if (!en.isIntersecting) return;
-          var b = stage.getBoundingClientRect();
-          if (b.bottom - 120 < window.innerHeight) started = true;
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          visible = entry.isIntersecting;
+          if (visible && entry.intersectionRatio >= 0.5) started = true;
         });
-      }, { threshold: [0, 0.25, 0.5, 0.75, 1] }).observe(stage);
-      window.addEventListener('scroll', function () {
-        if (!started && visible && stage.getBoundingClientRect().bottom - 120 < window.innerHeight) started = true;
-      }, { passive: true });
+      }, { threshold: [0, 0.5] }).observe(perch);
     } else { visible = true; started = true; }
   })();
 </script>
