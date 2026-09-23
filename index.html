@@ -612,10 +612,8 @@ async function play(speed=1){
  }catch(e){/* Always expose the page if an animation is interrupted. */}
  finally{clearTimeout(failSafe);cover.hidden=true;animations.forEach(a=>a.cancel());running=false;}
 }
-// Run once per tab session; direct section links remain immediately accessible.
-let seen=false;
-try{seen=sessionStorage.getItem('andliu-entrance-v2')==='seen';sessionStorage.setItem('andliu-entrance-v2','seen')}catch(e){}
-if(!seen&&!location.hash)play();
+// Replay on every homepage load or refresh; direct section links stay accessible.
+if(!location.hash || location.hash === '#top')play();
 })();
 </script>
 </body>
