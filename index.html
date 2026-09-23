@@ -97,7 +97,7 @@
     }
 
     .masthead {
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
       gap: 24px; padding: 25px var(--gutter) 28px; border-bottom: 1px solid var(--ink);
     }
     .wordmark {
@@ -106,8 +106,8 @@
     }
     .wordmark .amp { font-family: 'Marcellus', serif; color: var(--accent); letter-spacing: -0.11em; }
     .slogan {
-      font-size: clamp(18px, 3.05vw, 48px); font-weight: 400; line-height: 1.08; letter-spacing: -0.035em;
-      margin: 0; max-width: 52%; text-transform: uppercase;
+      font-size: clamp(16px, 2.75vw, 43px); font-weight: 400; line-height: 1.08; letter-spacing: -0.035em;
+      margin: 0 0 6px; max-width: 52%; text-transform: uppercase;
     }
     .slogan span { display: block; color: var(--accent); }
     @media (max-width: 600px) {
