@@ -972,16 +972,20 @@ if(!location.hash || location.hash === '#top')play();
       stage.appendChild(el);
       setTimeout(function () { el.remove(); }, 1900);
     }
-    function floatSprite(name, fx, pixelSize) {
+    function floatSprite(name, fx, pixelSize, colorOverride) {
       var sp = SPRITES[name], px = pixelSize || 3, el = document.createElement('canvas');
       el.width = sp.r[0].length * px; el.height = sp.r.length * px;
       var x2 = el.getContext('2d');
       sp.r.forEach(function (rw, y) { rw.split('').forEach(function (ch, x) {
-        if (ch !== '.') { x2.fillStyle = sp.c[ch]; x2.fillRect(x * px, y * px, px, px); }
+        if (ch !== '.') { x2.fillStyle = colorOverride || sp.c[ch]; x2.fillRect(x * px, y * px, px, px); }
       }); });
       el.className = 'cat-float'; el.setAttribute('aria-hidden', 'true');
       place(el, fx == null ? 0.15 + Math.random() * 0.6 : fx, el.width);
     }
+    // Each pet's heart steps through the rainbow (1st=red, 2nd=orange, ...), wrapping
+    // if petting continues past violet -- colorOverride only touches this one call site,
+    // SPRITES.heart's own color is untouched for the other hearts (feed completion, goodies).
+    var RAINBOW = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#0A84FF', '#5E5CE6', '#AF52DE'];
     function floatText(text, fx) {
       var el = document.createElement('div');
       el.className = 'cat-float cat-float--text'; el.setAttribute('aria-hidden', 'true');
@@ -1021,7 +1025,7 @@ if(!location.hash || location.hash === '#top')play();
       if (phase !== 'code' || !visible) return;
       if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) {
         pets++;
-        floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7));
+        floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7), RAINBOW[(pets - 1) % RAINBOW.length]);
         if (pets >= 10) { pets = 0; phase = 'feed'; t = 0; }
       }
     });
