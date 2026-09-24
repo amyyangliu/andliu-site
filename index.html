@@ -171,14 +171,7 @@
       .project + .project { margin-top: 35px; }
     }
 
-    /* ------------------------------------------------------------------
-       ABOUT (Amy's bio) + CLIENT LOGO STRIP
-       The logo marquee mechanics (grey/color crossfade pairs, no filter or
-       opacity on the moving track, script-driven motion on touch, all the
-       Safari-safety work) are unchanged from before; only its backdrop
-       moves from the old yellow band to the new plain white page, and the
-       edge fade + "Experience with" label are restyled to match.
-       ------------------------------------------------------------------ */
+    /* ABOUT (Amy's bio) + CLIENT LOGO STRIP */
     /* orange band -- .eyebrow is shared with the (dark-background) contact section, where
        accent-on-dark already reads fine, so its white-on-orange override is scoped to .about
        specifically rather than changed at the shared rule */
@@ -195,49 +188,37 @@
     .experience { padding: 30px var(--gutter) 70px; }
     .logo-marquee { width: 100%; margin-top: 24px; }
     .logo-row {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-      gap: clamp(32px, 6vw, 88px); max-width: 1300px; margin: 0 auto; padding: 40px var(--gutter) 0;
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center;
+      gap: clamp(16px, 3vw, 48px); max-width: 1300px; margin: 0 auto; padding: 40px var(--gutter) 0;
     }
     .logo-slot {
-      position: relative; flex: none; display: flex; align-items: center; justify-content: center;
-      height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
+      position: relative; min-width: 0; height: 70px; overflow: hidden;
     }
-    .logo-slot[data-logo="hm"]               { --logo-scale: 1.45; }
-    .logo-slot[data-logo="samsung"]          { --logo-scale: 0.88; }
-    .logo-slot[data-logo="underarmour"]      { --logo-scale: 1.5; }
-    .logo-slot[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
-    /* Each of the 5 slots holds a fixed spot in the row; on its own slow clock (see the script
-       below) it quietly swaps to a different logo from the 2-logo reserve pool (7 logos total),
-       staggered per slot so only one changes at a time -- a calm rhythm, not a scroll or a
-       bounce. The swap itself: the outgoing logo lifts and fades, the incoming one settles up
-       from below in grey, softly turns to its true color, holds there briefly, then eases back
-       to grey well before its next turn -- so grey is the row's resting state and color is a
-       brief, quiet highlight, never two of the same brand visible at once by construction (the
-       reserve queue always holds exactly the logos not currently shown). */
-    .logo-slot-inner {
-      position: relative; display: inline-block; height: 100%;
-      transition: transform 550ms cubic-bezier(.45,0,.15,1), opacity 550ms cubic-bezier(.45,0,.15,1);
-    }
-    .logo-slot-inner.is-below { transform: translateY(14px); opacity: 0; }
-    .logo-slot-inner.is-above { transform: translateY(-14px); opacity: 0; }
-    .logo-slot-inner.no-transition { transition: none; }
+    .logo-face[data-logo="hm"]               { --logo-scale: 1.45; }
+    .logo-face[data-logo="samsung"]          { --logo-scale: 0.88; }
+    .logo-face[data-logo="underarmour"]      { --logo-scale: 1.5; }
+    .logo-face[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
+    /* Both faces occupy the same fixed cell, so changing logo widths never shifts the row. */
     .logo-face {
-      display: inline-flex; align-items: center; height: 100%;
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      will-change: transform, opacity;
+      transition: transform 420ms cubic-bezier(.4,0,.2,1), opacity 420ms cubic-bezier(.4,0,.2,1);
     }
-    .logo-face img { display: block; height: 100%; max-width: none; }
-    .logo-face--grey img { width: auto; }
-    .logo-face--color {
-      position: absolute; inset: 0; opacity: 0;
-      transition: opacity 700ms cubic-bezier(.45,0,.15,1);
+    .logo-face img {
+      display: block; max-width: 100%; width: auto; height: auto;
+      max-height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
+      object-fit: contain; filter: brightness(0);
     }
-    .logo-face--color img { width: 100%; object-fit: contain; }
-    .logo-slot.is-color .logo-face--color { opacity: 1; }
+    .logo-face--next { transform: translateY(22px); opacity: 0; }
+    .logo-slot.is-flipping .logo-face--current { transform: translateY(-22px); opacity: 0; }
+    .logo-slot.is-flipping .logo-face--next { transform: translateY(0); opacity: 1; }
+    .logo-slot.no-transition .logo-face { transition: none; }
     .logo-slot, .logo-slot img {
       -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
     }
     @media (max-width: 700px) {
-      .logo-row { gap: 26px 20px; padding: 28px 16px 0; }
+      .logo-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 28px 16px 0; }
       .logo-slot:nth-child(4), .logo-slot:nth-child(5) { display: none; }
     }
     @media (max-width: 600px) { .experience { padding: 15px 16px 40px; } }
@@ -304,7 +285,7 @@
 @media(prefers-reduced-motion:reduce){#entrance{display:none}}
     @media (prefers-reduced-motion: reduce) {
       .menu, .menu li { transition: none; }
-      .logo-slot-inner, .logo-face--color { transition: none; }
+      .logo-face { transition: none; }
       html { scroll-behavior: auto; }
     }
     /* SERVICES: selected work leads into offers, followed by Amy’s introduction. */
@@ -465,11 +446,11 @@
     <div class="mono">Experience with</div>
     <div class="logo-marquee">
       <div class="logo-row">
-        <div class="logo-slot" data-logo="hm"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/hm.png" alt="H&amp;M"></span><span class="logo-face logo-face--color"><img src="images/logos/hm.svg" alt="" aria-hidden="true"></span></div></div>
-        <div class="logo-slot" data-logo="unilever"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/unilever.png" alt="Unilever"></span><span class="logo-face logo-face--color"><img src="images/logos/unilever.svg" alt="" aria-hidden="true"></span></div></div>
-        <div class="logo-slot" data-logo="heineken"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt="Heineken"></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt="" aria-hidden="true"></span></div></div>
-        <div class="logo-slot" data-logo="samsung"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt="Samsung"></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt="" aria-hidden="true"></span></div></div>
-        <div class="logo-slot" data-logo="amgen"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt="Amgen"></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt="" aria-hidden="true"></span></div></div>
+        <div class="logo-slot" data-logo="hm"><span class="logo-face logo-face--current" data-logo="hm"><img src="images/logos/grey/hm.png" alt="H&amp;M"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
+        <div class="logo-slot" data-logo="unilever"><span class="logo-face logo-face--current" data-logo="unilever"><img src="images/logos/grey/unilever.png" alt="Unilever"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
+        <div class="logo-slot" data-logo="heineken"><span class="logo-face logo-face--current" data-logo="heineken"><img src="images/logos/grey/heineken.png" alt="Heineken"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
+        <div class="logo-slot" data-logo="samsung"><span class="logo-face logo-face--current" data-logo="samsung"><img src="images/logos/grey/samsung.png" alt="Samsung"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
+        <div class="logo-slot" data-logo="amgen"><span class="logo-face logo-face--current" data-logo="amgen"><img src="images/logos/grey/amgen.png" alt="Amgen"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
       </div>
     </div>
   </section>
@@ -626,74 +607,70 @@
     });
   })();
 
-  // Logo row: 5 fixed positions, 7 logos total. Each position runs its own slow, self-scheduled
-  // loop -- rest in grey, lift and fade out, swap in the next logo from a shared reserve queue,
-  // rise back in from below (still grey), softly reveal its true color, hold briefly, ease back
-  // to grey, then rest again until its next turn. Positions are staggered on start so only one
-  // is ever mid-swap at a time. The reserve queue always holds exactly the logos not currently
-  // shown, so no brand ever appears in two positions at once.
+  // Flip the whole row upward together, with one short pause between rows.
+  // Each row contains five distinct brands from the seven-logo set.
   (function () {
     var slots = [].slice.call(document.querySelectorAll('.logo-slot'));
     if (!slots.length) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     var ASSETS = {
-      hm:               { color: 'images/logos/hm.svg',               grey: 'images/logos/grey/hm.png',               alt: 'H&M' },
-      unilever:         { color: 'images/logos/unilever.svg',         grey: 'images/logos/grey/unilever.png',         alt: 'Unilever' },
-      heineken:         { color: 'images/logos/heineken.svg',         grey: 'images/logos/grey/heineken.png',         alt: 'Heineken' },
-      samsung:          { color: 'images/logos/samsung.svg',          grey: 'images/logos/grey/samsung.png',          alt: 'Samsung' },
-      amgen:            { color: 'images/logos/amgen.svg',            grey: 'images/logos/grey/amgen.png',            alt: 'Amgen' },
-      underarmour:      { color: 'images/logos/underarmour.svg',      grey: 'images/logos/grey/underarmour.png',      alt: 'Under Armour' },
-      frieslandcampina: { color: 'images/logos/frieslandcampina.png', grey: 'images/logos/grey/frieslandcampina.png', alt: 'FrieslandCampina' }
+      hm:               { src: 'images/logos/grey/hm.png',               alt: 'H&M' },
+      unilever:         { src: 'images/logos/grey/unilever.png',         alt: 'Unilever' },
+      heineken:         { src: 'images/logos/grey/heineken.png',         alt: 'Heineken' },
+      samsung:          { src: 'images/logos/grey/samsung.png',          alt: 'Samsung' },
+      amgen:            { src: 'images/logos/grey/amgen.png',            alt: 'Amgen' },
+      underarmour:      { src: 'images/logos/grey/underarmour.png',      alt: 'Under Armour' },
+      frieslandcampina: { src: 'images/logos/grey/frieslandcampina.png', alt: 'FrieslandCampina' }
     };
-    var shown = slots.map(function (s) { return s.dataset.logo; });
-    var reserve = Object.keys(ASSETS).filter(function (k) { return shown.indexOf(k) === -1; });
+    var keys = Object.keys(ASSETS), start = 0, timer, running = false;
+    var FLIP_MS = 420, REST_MS = 1800;
 
-    var CYCLE = 16000, EXIT = 550, ENTER = 650, SETTLE = 300, REVEAL = 700, COLOR_HOLD = 1800;
-    var GREY_HOLD = CYCLE - EXIT - ENTER - SETTLE - REVEAL - COLOR_HOLD;
+    // Load the two initially hidden brands before the first flip.
+    keys.forEach(function (key) { var img = new Image(); img.src = ASSETS[key].src; });
 
-    function setContent(slot, key) {
-      var a = ASSETS[key];
-      slot.dataset.logo = key;
-      var greyImg = slot.querySelector('.logo-face--grey img');
-      var colorImg = slot.querySelector('.logo-face--color img');
-      greyImg.src = a.grey;
-      greyImg.alt = a.alt;
-      colorImg.src = a.color;
+    function schedule(delay) {
+      clearTimeout(timer);
+      if (running) timer = setTimeout(flip, delay);
     }
 
-    function runCycle(slot) {
-      var inner = slot.querySelector('.logo-slot-inner');
-      setTimeout(function () {
-        inner.classList.add('is-above');
+    function flip() {
+      start = (start + slots.length) % keys.length;
+      var nextKeys = slots.map(function (slot, i) {
+        var key = keys[(start + i) % keys.length];
+        var nextFace = slot.querySelector('.logo-face--next');
+        nextFace.dataset.logo = key;
+        nextFace.querySelector('img').src = ASSETS[key].src;
+        return key;
+      });
+      requestAnimationFrame(function () {
+        slots.forEach(function (slot) { slot.classList.add('is-flipping'); });
         setTimeout(function () {
-          var outgoing = slot.dataset.logo;
-          var incoming = reserve.shift();
-          reserve.push(outgoing);
-          slot.classList.remove('is-color');
-          setContent(slot, incoming);
-          inner.classList.add('no-transition');
-          inner.classList.remove('is-above');
-          inner.classList.add('is-below');
-          void inner.offsetWidth;
-          inner.classList.remove('no-transition');
-          requestAnimationFrame(function () {
-            inner.classList.remove('is-below');
-            setTimeout(function () {
-              slot.classList.add('is-color');
-              setTimeout(function () {
-                slot.classList.remove('is-color');
-                runCycle(slot);
-              }, REVEAL + COLOR_HOLD);
-            }, ENTER + SETTLE);
+          slots.forEach(function (slot, i) {
+            var key = nextKeys[i], currentFace = slot.querySelector('.logo-face--current');
+            var current = currentFace.querySelector('img');
+            slot.classList.add('no-transition');
+            current.src = ASSETS[key].src;
+            current.alt = ASSETS[key].alt;
+            currentFace.dataset.logo = key;
+            slot.dataset.logo = key;
+            slot.classList.remove('is-flipping');
           });
-        }, EXIT);
-      }, GREY_HOLD);
+          requestAnimationFrame(function () {
+            slots.forEach(function (slot) { slot.classList.remove('no-transition'); });
+            schedule(REST_MS);
+          });
+        }, FLIP_MS);
+      });
     }
 
-    slots.forEach(function (slot, i) {
-      setTimeout(function () { runCycle(slot); }, i * (CYCLE / slots.length));
-    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        running = entries[0].isIntersecting;
+        if (running) schedule(750);
+        else clearTimeout(timer);
+      }, { threshold: 0.1 }).observe(document.querySelector('.experience'));
+    } else { running = true; schedule(750); }
   })();
 
   // Trailing cursor dot: unchanged from before.
@@ -1063,19 +1040,21 @@ if(!location.hash || location.hash === '#top')play();
     ];
     var nigiriColors = { S: '#F2887A', H: '#FBB3A6', s: '#D4685C', R: '#FFFAF5', r: '#E9DCD0', K: '#B9564A' };
 
-    // Four bent strokes form the familiar manga anger vein in the cat's pixel style.
-    var anger = [
-      "VVV...VVV",
-      "V.V...V.V",
-      "V.VV.VV.V",
-      "...V.V...",
-      ".........",
-      "...V.V...",
-      "V.VV.VV.V",
-      "V.V...V.V",
-      "VVV...VVV"
+    // A sweat drop, not a vein cluster: a tapered point over a round belly survives being
+    // drawn 21px wide, where thin crossed veins only ever read as a spider at this size.
+    // Blue is free here -- the only other blue in the scene is the tuna, which never shares
+    // a beat with the golf ball.
+    var drop = [
+      "...E...",
+      "..EHE..",
+      "..EWE..",
+      ".EWWWE.",
+      ".EHWWE.",
+      "EWWWWWE",
+      ".EWWWE.",
+      "..EEE.."
     ];
-    var angerColors = { V: '#E23B2E' };
+    var dropColors = { W: '#8FCDEA', E: '#5B9FC4', H: '#D7F1FA' };
 
     // One drawer for every hand-built grid, with an optional tilt so a treat can fall at an
     // angle and a cell multiplier so each item can be sized against the fish independently.
@@ -1271,14 +1250,15 @@ if(!location.hash || location.hash === '#top')play();
             }
           }
         }
-        // A golf ball is not food. The anger mark pops beside the cat's left ear
-        // when the ball lands, where it stays readable against the black background.
+        // A golf ball is not food. A sweat drop pops at the cat's left temple when the ball
+        // lands, slides down a touch, then holds -- placed just outside the glasses bar,
+        // which starts at column 5, so it reads against the face rather than over it.
         if (!eaten) {
-          var ang = reduceMotion ? 400 : t - 1040;
+          var ang = reduceMotion ? 1200 : t - 1040;
           if (ang > 0) {
             var pop = Math.min(ang / 170, 1);
-            var angScale = pop < 1 ? 0.45 + 0.55 * pop : 1 + Math.sin(ang / 190) * 0.07;
-            drawPixelGrid(anger, angerColors, ox, oy + 6 * S, angScale, 1, 0);
+            var dropSlide = Math.min(Math.max((ang - 170) / 900, 0), 1) * 7;
+            drawPixelGrid(drop, dropColors, ox + 4 * S, oy + 7 * S + dropSlide, 0.45 + 0.55 * pop, 0.8, 0);
           }
         }
       }
