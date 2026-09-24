@@ -89,11 +89,29 @@
       padding: 18px var(--gutter);
       font-size: 12px; line-height: 1.35;
     }
+    /* Left cell: the tagline until the big wordmark scrolls under the bar, then a mini &Liu
+       takes its place (toggled by .is-scrolled, set from the observer near the clock script)
+       and doubles as the back-to-top button. */
+    .topline .brand { position: relative; }
+    .topline .tagline, .topline .mini-mark {
+      transition: opacity .35s ease, transform .45s cubic-bezier(.16,1,.3,1), visibility .45s;
+    }
+    .topline .mini-mark {
+      position: absolute; top: 50%; left: 0;
+      font-family: 'Italiana', serif; font-size: 34px; line-height: 1; letter-spacing: -0.065em;
+      text-transform: none; white-space: nowrap;
+      opacity: 0; visibility: hidden; transform: translateY(-20%);
+    }
+    .topline .mini-mark:hover { text-decoration: none; }
+    .topline .mini-mark .amp { font-family: 'Marcellus', serif; color: var(--accent); letter-spacing: -0.11em; }
+    .topline.is-scrolled .tagline { opacity: 0; visibility: hidden; transform: translateY(-40%); }
+    .topline.is-scrolled .mini-mark { opacity: 1; visibility: visible; transform: translateY(-50%); }
     .topline .time { text-align: center; }
     .topline .inquire { text-align: right; font-weight: bold; }
     @media (max-width: 600px) {
       .topline { grid-template-columns: 1fr 1fr; padding: 16px; font-size: 10px; }
       .topline .time { display: none; }
+      .topline .mini-mark { font-size: 28px; }
     }
 
     .masthead {
@@ -401,7 +419,10 @@
 <body>
 
 <div class="topline mono">
-  <div>Web design &amp; branding<br>For businesses moving forward.</div>
+  <div class="brand">
+    <div class="tagline">Web design &amp; branding<br>For businesses moving forward.</div>
+    <a class="mini-mark" href="/" aria-label="&amp;Liu, back to top" tabindex="-1"><span class="amp">&amp;</span>Liu</a>
+  </div>
   <div class="time" id="clock">00:00:00 / PT</div>
   <a class="inquire" href="#contact">Let&rsquo;s talk &#8599;</a>
 </div>
@@ -576,6 +597,27 @@
     tick();
     setInterval(tick, 1000);
   })();
+
+  // Once the big masthead wordmark scrolls up under the sticky topline, swap the topline's
+  // tagline for a mini &Liu that scrolls back to the top (and clears any #hash) when clicked.
+  (function () {
+    var bar = document.querySelector('.topline');
+    var big = document.querySelector('.masthead .wordmark');
+    var mini = bar && bar.querySelector('.mini-mark');
+    if (!bar || !big || !mini || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (entries) {
+      var hidden = !entries[0].isIntersecting;
+      bar.classList.toggle('is-scrolled', hidden);
+      mini.tabIndex = hidden ? 0 : -1;
+    }, { rootMargin: '-' + bar.offsetHeight + 'px 0px 0px 0px' }).observe(big);
+    mini.addEventListener('click', function (e) {
+      e.preventDefault();
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    });
+  })();
+
 
   // Case study videos: autoplay muted once scrolled into view (respecting reduced-motion),
   // pause once scrolled away, and each has its own Play/Pause button that overrides the
