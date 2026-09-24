@@ -1054,9 +1054,61 @@ if(!location.hash || location.hash === '#top')play();
       });
     }
 
-    // Sushi, cake, and the golf ball are pre-rendered 24x24-grid pixel-art PNGs (matching the
-    // fish's own cell size below) rather than hand-coded grids like the fish above.
-    var GOODY_SRC = { sushi: 'images/cat-goodies/sushi-roll.png', cake: 'images/cat-goodies/cake-slice.png', golf: 'images/cat-goodies/golf-ball.png' };
+    // Nigiri, hand-drawn on the same 4px cell grid as the fish above. Its salmon is a warm
+    // coral rather than the cat's own bubblegum pink, so the slab never melts into the cat.
+    var nigiri = [
+      "....................",
+      "......KKKKKKKK......",
+      "....KKHHSSSSSSKK....",
+      "..KKSHHSSSSSSSSSKK..",
+      ".KSSSSSSSSSSSSSSSSK.",
+      ".KSSSSSSSSSSSSSSSSK.",
+      ".KssSSSSSSSSSSSSssK.",
+      "..KssssssssssssssK..",
+      "..KRRRRRRRRRRRRRRK..",
+      "..KRRrRRRRRRRrRRRK..",
+      "...KRRRRRRRRRRRRK...",
+      "....KKKKKKKKKKKK...."
+    ];
+    var nigiriColors = { S: '#F2887A', H: '#FBB3A6', s: '#D4685C', R: '#FFFAF5', r: '#E9DCD0', K: '#B9564A' };
+
+    // An anime-style anger mark: four blunt veins radiating from a hollow centre.
+    var anger = [
+      "..V.V..",
+      ".VV.VV.",
+      "VV...VV",
+      ".......",
+      "VV...VV",
+      ".VV.VV.",
+      "..V.V.."
+    ];
+    var angerColors = { V: '#E23B2E' };
+
+    // One drawer for every hand-built grid, with an optional tilt so a treat can fall at an
+    // angle and a cell multiplier so each item can be sized against the fish independently.
+    function drawPixelGrid(grid, colors, cx, cy, scale, cell, tilt) {
+      if (scale <= 0.02) return;
+      var px = Math.max(1, Math.round(4 * scale * (cell || 1)));
+      var w = grid[0].length * px, h = grid.length * px;
+      ctx.save();
+      ctx.translate(Math.round(cx), Math.round(cy));
+      if (tilt) ctx.rotate(tilt);
+      grid.forEach(function (row, y) {
+        row.split('').forEach(function (ch, x) {
+          if (ch === '.') return;
+          ctx.fillStyle = colors[ch];
+          ctx.fillRect(Math.round(-w / 2 + x * px), Math.round(-h / 2 + y * px), px, px);
+        });
+      });
+      ctx.restore();
+    }
+
+    // The cake and golf ball are pre-rendered pixel-art PNGs drawn on a 24x24 grid. Sized
+    // down per item so they read at the fish's weight instead of towering over it: the fish
+    // occupies a 22x13-cell box, so a 24-cell square was nearly twice its height.
+    var GOODY_SRC = { cake: 'images/cat-goodies/cake-slice.png', golf: 'images/cat-goodies/golf-ball.png' };
+    var GOODY_CELLS = { cake: 15, golf: 10 };
+    var GOODY_TILT = { nigiri: -0.30, cake: -0.24 };
     var goodyImages = {};
     Object.keys(GOODY_SRC).forEach(function (key) {
       var img = new Image();
@@ -1068,17 +1120,23 @@ if(!location.hash || location.hash === '#top')play();
       var img = goodyImages[key];
       if (!img.complete || !img.naturalWidth) return;
       var px = Math.max(1, Math.round(4 * scale));
-      var size = 24 * px;
+      var size = (GOODY_CELLS[key] || 24) * px;
+      var tilt = GOODY_TILT[key] || 0;
+      ctx.save();
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, Math.round(cx - size / 2), Math.round(cy - size / 2), size, size);
+      ctx.translate(Math.round(cx), Math.round(cy));
+      if (tilt) ctx.rotate(tilt);
+      ctx.drawImage(img, Math.round(-size / 2), Math.round(-size / 2), size, size);
+      ctx.restore();
     }
     function drawGoody(key, cx, cy, scale) {
       if (key === 'fish') drawTuna(cx, cy, scale);
+      else if (key === 'nigiri') drawPixelGrid(nigiri, nigiriColors, cx, cy, scale, 0.9, GOODY_TILT.nigiri);
       else drawGoodyImage(key, cx, cy, scale);
     }
-    // Feed drops cycle fish -> sushi -> cake -> golf ball, repeating. The cat eats the first
+    // Feed drops cycle fish -> nigiri -> cake -> golf ball, repeating. The cat eats the first
     // three; the golf ball bounces and rolls away instead (see the feed drawing block below).
-    var FEED_ITEMS = ['fish', 'sushi', 'cake', 'golf'];
+    var FEED_ITEMS = ['fish', 'nigiri', 'cake', 'golf'];
     var feedIndex = 0;
     var feedItem = 'fish';
 
@@ -1218,6 +1276,16 @@ if(!location.hash || location.hash === '#top')play();
               var bounce = Math.abs(Math.sin(bt * Math.PI * 2.2)) * 18 * (1 - bt);
               drawGoody('golf', mouthX + ease(bt) * 90, groundY - bounce, 1);
             }
+          }
+        }
+        // A golf ball is not food. The cat pops an anger mark on its left temple the
+        // moment the ball lands and keeps it for the rest of the beat.
+        if (!eaten) {
+          var ang = reduceMotion ? 400 : t - 1040;
+          if (ang > 0) {
+            var pop = Math.min(ang / 170, 1);
+            var angScale = pop < 1 ? 0.45 + 0.55 * pop : 1 + Math.sin(ang / 190) * 0.07;
+            drawPixelGrid(anger, angerColors, ox + 6 * S, oy + 4 * S, angScale, 1, 0);
           }
         }
       }
