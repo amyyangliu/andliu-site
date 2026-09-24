@@ -187,7 +187,9 @@
     .about .eyebrow { color: #fff; opacity: 0.85; }
     .about h2 { font-family: 'Marcellus', serif; font-weight: 400; font-size: clamp(36px, 4.6vw, 70px); line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 30px; color: #fff; }
     .about p { font-size: 18px; line-height: 1.65; max-width: 600px; margin: 0 0 20px; opacity: 0.85; color: #fff; }
-    .portrait { width: 100%; max-height: 540px; object-fit: cover; object-position: center 35%; }
+    /* width/height attrs + height:auto reserve the photo's space before it lazy-loads, so
+       "Let's talk" -> #contact doesn't land short when it pops in and pushes the page down */
+    .portrait { width: 100%; height: auto; max-height: 540px; object-fit: cover; object-position: center 35%; }
     @media (max-width: 600px) { .about { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; } .about p { font-size: 16px; } .portrait { max-height: 380px; } }
 
     .experience { padding: 30px var(--gutter) 70px; }
@@ -462,7 +464,7 @@
       <p>I founded &amp;Liu Studio to bring agency-level craft directly to startups and independent businesses.</p>
       <p>My agency experience includes work for brands like Samsung and Heineken. Now, I work directly with you to shape a website and identity that feel like your business, with the same care and fewer layers.</p>
     </div>
-    <img class="portrait" src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" loading="lazy">
+    <img class="portrait" src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" width="1122" height="1402" loading="lazy">
   </section>
 
   <section class="experience" aria-label="Agency experience">
