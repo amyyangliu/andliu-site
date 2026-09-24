@@ -156,6 +156,11 @@
     /* ------------------------------------------------------------------
        PROJECTS
        ------------------------------------------------------------------ */
+    /* The gap between two projects is the first one's 40px bottom pad plus the next one's
+       70px margin and 18px top pad. The last project has no neighbour to supply those, so
+       its copy ran almost straight into the dark section below; pad #work by the same 88px
+       so the breathing room under WEASE matches the room under the other two. */
+    #work { padding-bottom: 88px; }
     .project { padding: 18px 0 0; }
     .project + .project { margin-top: 70px; }
     .project-head { display: flex; justify-content: space-between; gap: 18px; margin: 0 var(--gutter) 12px; font-size: 12px; }
@@ -177,6 +182,7 @@
       .project-bottom { display: block; padding: 20px 16px 26px; }
       .project-bottom p { margin-top: 12px; font-size: 15px; }
       .project + .project { margin-top: 35px; }
+      #work { padding-bottom: 53px; }   /* 26 + 53 matches the 79px between projects here */
     }
 
     /* ABOUT (Amy's bio) + CLIENT LOGO STRIP */
