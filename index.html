@@ -191,125 +191,61 @@
     @media (max-width: 600px) { .about { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; } .about p { font-size: 16px; } .portrait { max-height: 380px; } }
 
     .experience { padding: 30px var(--gutter) 70px; }
-    @keyframes logoScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    .logo-marquee { position: relative; width: 100%; overflow: hidden; padding: 56px 0; margin-top: 24px; }
-    .logo-marquee::before, .logo-marquee::after {
-      content: ''; position: absolute; top: 0; bottom: 0; width: 8%; z-index: 1; pointer-events: none;
+    .logo-marquee { width: 100%; margin-top: 24px; }
+    .logo-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: clamp(32px, 6vw, 88px); max-width: 1300px; margin: 0 auto; padding: 40px var(--gutter) 0;
     }
-    .logo-marquee::before { left: 0;  background: linear-gradient(90deg,  var(--bg), rgba(255,255,255,0)); }
-    .logo-marquee::after  { right: 0; background: linear-gradient(270deg, var(--bg), rgba(255,255,255,0)); }
-    .logo-track {
-      --logo-gap: clamp(56px, 7vw, 96px);
-      display: flex; align-items: center; width: max-content; gap: var(--logo-gap);
-      padding-right: var(--logo-gap);
-      animation: logoScroll 34s linear infinite;
-    }
-    .logo-track.is-driven { animation: none; }
-    .logo-item { position: relative; flex: none; display: block;
+    .logo-slot {
+      position: relative; flex: none; display: flex; align-items: center; justify-content: center;
       height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
-      perspective: 500px; }
-    .logo-item[data-logo="hm"]               { --logo-scale: 1.45; }
-    .logo-item[data-logo="samsung"]          { --logo-scale: 0.88; }
-    .logo-item[data-logo="underarmour"]      { --logo-scale: 1.5; }
-    .logo-item[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
-    /* Each logo also hops up and down as the row scrolls -- a separate transform on .logo-item
-       itself (never .logo-flip, which owns the rotateY flip), so the two motions never compete.
-       Choreography, timed against .logo-flip below (same duration, same delay formula, same
-       clock): rises from rest while still grey, reaches the top right as the flip below finishes
-       turning it to true color, holds there, then drops fast (gravity-style ease-in, not a
-       glide) and lands with a small bounce -- still in color throughout -- before resting and
-       having the flip below turn it back to grey in time for the next rise. Staggered via
-       --logo-i so several logos are mid-cycle at any instant, reading as a wave rolling across
-       the row. --logo-i is redeclared here (rather than reused from .logo-flip below) because
-       custom properties don't cascade upward from a child to its own ancestor. */
-    .logo-item {
-      animation: logoWaveBob 2s linear infinite;
-      animation-delay: calc(var(--logo-i, 0) * -0.3s);
     }
-    .logo-item[data-logo="hm"]               { --logo-i: 0; }
-    .logo-item[data-logo="unilever"]         { --logo-i: 1; }
-    .logo-item[data-logo="heineken"]         { --logo-i: 2; }
-    .logo-item[data-logo="samsung"]          { --logo-i: 3; }
-    .logo-item[data-logo="amgen"]            { --logo-i: 4; }
-    .logo-item[data-logo="underarmour"]      { --logo-i: 6; }
-    .logo-item[data-logo="frieslandcampina"] { --logo-i: 7; }
-    @keyframes logoWaveBob {
-      0%   { transform: translateY(0);     animation-timing-function: cubic-bezier(.45,0,.15,1); }
-      18%  { transform: translateY(-36px); animation-timing-function: linear; }
-      26%  { transform: translateY(-36px); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
-      36%  { transform: translateY(0);     animation-timing-function: cubic-bezier(.34,1.56,.64,1); }
-      42%  { transform: translateY(-18px); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
-      48%  { transform: translateY(0); }
-      100% { transform: translateY(0); }
-    }
-    /* Each logo is a 3D card: a grey face forward, its true-color face on the back (pre-rotated
-       so it faces the right way once the card turns). Grey while it rises, a slow smooth flip to
-       true color that finishes right as it crests (see .logo-item above -- same duration, same
-       delay formula, same clock), stays in color through the hold, the fast drop, and the little
-       bounce on landing, then -- once it's settled and resting -- flips back to grey in time for
-       the next rise. Staggered per logo via --logo-i so they're never in sync. Hovering/pressing
-       a specific logo takes over from the ambient loop (animation:none + its own transition) and
-       holds it flipped; letting go hands control back to the loop, which restarts from grey
-       rather than resuming its old phase -- a deliberate, low-risk simplification, not a bug.
-       The hover/touch triggers themselves are unchanged from before: mouse devices use :hover,
-       and touch screens (no real hover; iOS fakes it unreliably by leaving :hover stuck on
-       whatever was touched last) get .is-lit from the existing script, which only ever toggles a
-       class name and never cared what that class visually did. */
-    .logo-flip {
+    .logo-slot[data-logo="hm"]               { --logo-scale: 1.45; }
+    .logo-slot[data-logo="samsung"]          { --logo-scale: 0.88; }
+    .logo-slot[data-logo="underarmour"]      { --logo-scale: 1.5; }
+    .logo-slot[data-logo="frieslandcampina"] { --logo-scale: 1.35; }
+    /* Each of the 5 slots holds a fixed spot in the row; on its own slow clock (see the script
+       below) it quietly swaps to a different logo from the 2-logo reserve pool (7 logos total),
+       staggered per slot so only one changes at a time -- a calm rhythm, not a scroll or a
+       bounce. The swap itself: the outgoing logo lifts and fades, the incoming one settles up
+       from below in grey, softly turns to its true color, holds there briefly, then eases back
+       to grey well before its next turn -- so grey is the row's resting state and color is a
+       brief, quiet highlight, never two of the same brand visible at once by construction (the
+       reserve queue always holds exactly the logos not currently shown). */
+    .logo-slot-inner {
       position: relative; display: inline-block; height: 100%;
-      transform-style: preserve-3d;
-      animation: logoAutoFlip 2s linear infinite;
-      animation-delay: calc(var(--logo-i, 0) * -0.3s);
+      transition: transform 550ms cubic-bezier(.45,0,.15,1), opacity 550ms cubic-bezier(.45,0,.15,1);
     }
-    .logo-item[data-logo="hm"]               .logo-flip { --logo-i: 0; }
-    .logo-item[data-logo="unilever"]         .logo-flip { --logo-i: 1; }
-    .logo-item[data-logo="heineken"]         .logo-flip { --logo-i: 2; }
-    .logo-item[data-logo="samsung"]          .logo-flip { --logo-i: 3; }
-    .logo-item[data-logo="amgen"]            .logo-flip { --logo-i: 4; }
-    .logo-item[data-logo="underarmour"]      .logo-flip { --logo-i: 6; }
-    .logo-item[data-logo="frieslandcampina"] .logo-flip { --logo-i: 7; }
-    @keyframes logoAutoFlip {
-      0%   { transform: rotateY(0deg);   animation-timing-function: cubic-bezier(.45,0,.15,1); }
-      16%  { transform: rotateY(180deg); animation-timing-function: linear; }
-      48%  { transform: rotateY(180deg); animation-timing-function: cubic-bezier(.45,0,.15,1); }
-      72%  { transform: rotateY(360deg); }
-      100% { transform: rotateY(360deg); }
-    }
+    .logo-slot-inner.is-below { transform: translateY(14px); opacity: 0; }
+    .logo-slot-inner.is-above { transform: translateY(-14px); opacity: 0; }
+    .logo-slot-inner.no-transition { transition: none; }
     .logo-face {
       display: inline-flex; align-items: center; height: 100%;
-      backface-visibility: hidden; -webkit-backface-visibility: hidden;
     }
     .logo-face img { display: block; height: 100%; max-width: none; }
     .logo-face--grey img { width: auto; }
     .logo-face--color {
-      position: absolute; inset: 0;
-      transform: rotateY(180deg);
+      position: absolute; inset: 0; opacity: 0;
+      transition: opacity 700ms cubic-bezier(.45,0,.15,1);
     }
     .logo-face--color img { width: 100%; object-fit: contain; }
     /* Under Armour's mark itself is plain black -- no brand color lives in the logo file, it
        lives in the red background UA always puts behind it. Recreate that: a red badge behind
-       the mark, with the mark inverted to white so it reads against the red. */
-    .logo-item[data-logo="underarmour"] .logo-face--color {
+       the mark, with the mark inverted to white so it reads against the red. Keyed off
+       data-logo, which the script updates live as the slot's content changes. */
+    .logo-slot[data-logo="underarmour"] .logo-face--color {
       background: #C8102E;
       padding: 8px 14px;
     }
-    .logo-item[data-logo="underarmour"] .logo-face--color img { filter: brightness(0) invert(1); }
-    @media (hover: hover) {
-      .logo-item:hover .logo-flip {
-        animation: none;
-        transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
-        transform: rotateY(180deg);
-      }
-    }
-    .logo-track.is-held { animation-play-state: paused; }
-    .logo-item.is-lit .logo-flip {
-      animation: none;
-      transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
-      transform: rotateY(180deg);
-    }
-    .logo-item, .logo-item img {
+    .logo-slot[data-logo="underarmour"] .logo-face--color img { filter: brightness(0) invert(1); }
+    .logo-slot.is-color .logo-face--color { opacity: 1; }
+    .logo-slot, .logo-slot img {
       -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
+    }
+    @media (max-width: 700px) {
+      .logo-row { gap: 26px 20px; padding: 28px 16px 0; }
+      .logo-slot:nth-child(4), .logo-slot:nth-child(5) { display: none; }
     }
     @media (max-width: 600px) { .experience { padding: 15px 16px 40px; } }
 
@@ -372,9 +308,7 @@
 @media(prefers-reduced-motion:reduce){#entrance{display:none}}
     @media (prefers-reduced-motion: reduce) {
       .menu, .menu li { transition: none; }
-      .logo-flip { animation: none; }
-      .logo-item { animation: none; }
-      .logo-item:hover .logo-flip, .logo-item.is-lit .logo-flip { transition: none; }
+      .logo-slot-inner, .logo-face--color { transition: none; }
       html { scroll-behavior: auto; }
     }
     /* SERVICES: selected work leads into offers, followed by Amy’s introduction. */
@@ -534,21 +468,12 @@
   <section class="experience" aria-label="Agency experience">
     <div class="mono">Experience with</div>
     <div class="logo-marquee">
-      <div class="logo-track">
-        <span class="logo-item" data-logo="hm"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/hm.png" alt="H&amp;M"></span><span class="logo-face logo-face--color"><img src="images/logos/hm.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="unilever"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/unilever.png" alt="Unilever"></span><span class="logo-face logo-face--color"><img src="images/logos/unilever.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="heineken"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt="Heineken"></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="samsung"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt="Samsung"></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="amgen"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt="Amgen"></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="underarmour"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/underarmour.png" alt="Under Armour"></span><span class="logo-face logo-face--color"><img src="images/logos/underarmour.svg" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="frieslandcampina"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/frieslandcampina.png" alt="FrieslandCampina"></span><span class="logo-face logo-face--color"><img src="images/logos/frieslandcampina.png" alt="" aria-hidden="true"></span></span></span>
-        <span class="logo-item" data-logo="hm" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/hm.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/hm.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="unilever" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/unilever.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/unilever.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="heineken" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="samsung" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="amgen" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="underarmour" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/underarmour.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/underarmour.svg" alt=""></span></span></span>
-        <span class="logo-item" data-logo="frieslandcampina" aria-hidden="true"><span class="logo-flip"><span class="logo-face logo-face--grey"><img src="images/logos/grey/frieslandcampina.png" alt=""></span><span class="logo-face logo-face--color"><img src="images/logos/frieslandcampina.png" alt=""></span></span></span>
+      <div class="logo-row">
+        <div class="logo-slot" data-logo="hm"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/hm.png" alt="H&amp;M"></span><span class="logo-face logo-face--color"><img src="images/logos/hm.svg" alt="" aria-hidden="true"></span></div></div>
+        <div class="logo-slot" data-logo="unilever"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/unilever.png" alt="Unilever"></span><span class="logo-face logo-face--color"><img src="images/logos/unilever.svg" alt="" aria-hidden="true"></span></div></div>
+        <div class="logo-slot" data-logo="heineken"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/heineken.png" alt="Heineken"></span><span class="logo-face logo-face--color"><img src="images/logos/heineken.svg" alt="" aria-hidden="true"></span></div></div>
+        <div class="logo-slot" data-logo="samsung"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/samsung.png" alt="Samsung"></span><span class="logo-face logo-face--color"><img src="images/logos/samsung.svg" alt="" aria-hidden="true"></span></div></div>
+        <div class="logo-slot" data-logo="amgen"><div class="logo-slot-inner"><span class="logo-face logo-face--grey"><img src="images/logos/grey/amgen.png" alt="Amgen"></span><span class="logo-face logo-face--color"><img src="images/logos/amgen.svg" alt="" aria-hidden="true"></span></div></div>
       </div>
     </div>
   </section>
@@ -617,7 +542,6 @@
       if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     });
   })();
-
 
   // Case study videos: autoplay muted once scrolled into view (respecting reduced-motion),
   // pause once scrolled away, and each has its own Play/Pause button that overrides the
@@ -701,77 +625,74 @@
     });
   })();
 
-  // Logo strip on touch screens: press-and-hold lights a logo up and holds the strip; release
-  // resumes it. Unchanged from before.
+  // Logo row: 5 fixed positions, 7 logos total. Each position runs its own slow, self-scheduled
+  // loop -- rest in grey, lift and fade out, swap in the next logo from a shared reserve queue,
+  // rise back in from below (still grey), softly reveal its true color, hold briefly, ease back
+  // to grey, then rest again until its next turn. Positions are staggered on start so only one
+  // is ever mid-swap at a time. The reserve queue always holds exactly the logos not currently
+  // shown, so no brand ever appears in two positions at once.
   (function () {
-    var track = document.querySelector('.logo-track');
-    if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
-    var lit = null, timer = null, startX = 0, startY = 0;
+    var slots = [].slice.call(document.querySelectorAll('.logo-slot'));
+    if (!slots.length) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    function unlight() {
-      clearTimeout(timer);
-      if (lit) lit.classList.remove('is-lit');
-      lit = null;
-    }
-    function release() { track.classList.remove('is-held'); }
-    function cancel() { release(); unlight(); }
-    function letGo() { release(); clearTimeout(timer); timer = setTimeout(unlight, 1200); }
+    var ASSETS = {
+      hm:               { color: 'images/logos/hm.svg',               grey: 'images/logos/grey/hm.png',               alt: 'H&M' },
+      unilever:         { color: 'images/logos/unilever.svg',         grey: 'images/logos/grey/unilever.png',         alt: 'Unilever' },
+      heineken:         { color: 'images/logos/heineken.svg',         grey: 'images/logos/grey/heineken.png',         alt: 'Heineken' },
+      samsung:          { color: 'images/logos/samsung.svg',          grey: 'images/logos/grey/samsung.png',          alt: 'Samsung' },
+      amgen:            { color: 'images/logos/amgen.svg',            grey: 'images/logos/grey/amgen.png',            alt: 'Amgen' },
+      underarmour:      { color: 'images/logos/underarmour.svg',      grey: 'images/logos/grey/underarmour.png',      alt: 'Under Armour' },
+      frieslandcampina: { color: 'images/logos/frieslandcampina.png', grey: 'images/logos/grey/frieslandcampina.png', alt: 'FrieslandCampina' }
+    };
+    var shown = slots.map(function (s) { return s.dataset.logo; });
+    var reserve = Object.keys(ASSETS).filter(function (k) { return shown.indexOf(k) === -1; });
 
-    track.addEventListener('touchstart', function (e) {
-      var item = e.target.closest ? e.target.closest('.logo-item') : null;
-      if (!item) return;
-      unlight();
-      lit = item;
-      item.classList.add('is-lit');
-      track.classList.add('is-held');
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-    track.addEventListener('touchmove', function (e) {
-      if (!lit) return;
-      var t = e.touches[0];
-      if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) cancel();
-    }, { passive: true });
-    track.addEventListener('touchend', letGo);
-    track.addEventListener('touchcancel', cancel);
-    document.addEventListener('touchstart', function (e) {
-      if (!e.target.closest || !e.target.closest('.logo-track')) cancel();
-    }, { passive: true });
-  })();
+    var CYCLE = 16000, EXIT = 550, ENTER = 650, SETTLE = 300, REVEAL = 700, COLOR_HOLD = 1800;
+    var GREY_HOLD = CYCLE - EXIT - ENTER - SETTLE - REVEAL - COLOR_HOLD;
 
-  // Logo strip motion on touch screens: a small script moves the track instead of the CSS
-  // animation, since iPhone Safari left stretches of it unpainted otherwise. Unchanged from before.
-  (function () {
-    var track = document.querySelector('.logo-track');
-    if (!track || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var SECONDS = 34, period = 0, pos = 0, last = 0, raf = 0, onScreen = true, tabVisible = !document.hidden;
-
-    function measure() { period = track.scrollWidth / 2; }
-    function frame(t) {
-      raf = requestAnimationFrame(frame);
-      var dt = last ? Math.min(t - last, 64) / 1000 : 0;
-      last = t;
-      if (!period || track.classList.contains('is-held')) return;
-      pos = (pos + period / SECONDS * dt) % period;
-      track.style.transform = 'translate3d(' + (-pos).toFixed(2) + 'px,0,0)';
-    }
-    function sync() {
-      cancelAnimationFrame(raf);
-      last = 0;
-      if (onScreen && tabVisible) raf = requestAnimationFrame(frame);
+    function setContent(slot, key) {
+      var a = ASSETS[key];
+      slot.dataset.logo = key;
+      var greyImg = slot.querySelector('.logo-face--grey img');
+      var colorImg = slot.querySelector('.logo-face--color img');
+      greyImg.src = a.grey;
+      greyImg.alt = a.alt;
+      colorImg.src = a.color;
     }
 
-    track.classList.add('is-driven');
-    measure();
-    window.addEventListener('resize', measure);
-    window.addEventListener('load', measure);
-    [].forEach.call(track.querySelectorAll('img'), function (img) { img.addEventListener('load', measure); });
-    document.addEventListener('visibilitychange', function () { tabVisible = !document.hidden; sync(); });
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) { onScreen = entries[0].isIntersecting; sync(); }).observe(track.parentNode);
+    function runCycle(slot) {
+      var inner = slot.querySelector('.logo-slot-inner');
+      setTimeout(function () {
+        inner.classList.add('is-above');
+        setTimeout(function () {
+          var outgoing = slot.dataset.logo;
+          var incoming = reserve.shift();
+          reserve.push(outgoing);
+          slot.classList.remove('is-color');
+          setContent(slot, incoming);
+          inner.classList.add('no-transition');
+          inner.classList.remove('is-above');
+          inner.classList.add('is-below');
+          void inner.offsetWidth;
+          inner.classList.remove('no-transition');
+          requestAnimationFrame(function () {
+            inner.classList.remove('is-below');
+            setTimeout(function () {
+              slot.classList.add('is-color');
+              setTimeout(function () {
+                slot.classList.remove('is-color');
+                runCycle(slot);
+              }, REVEAL + COLOR_HOLD);
+            }, ENTER + SETTLE);
+          });
+        }, EXIT);
+      }, GREY_HOLD);
     }
-    sync();
+
+    slots.forEach(function (slot, i) {
+      setTimeout(function () { runCycle(slot); }, i * (CYCLE / slots.length));
+    });
   })();
 
   // Trailing cursor dot: unchanged from before.
