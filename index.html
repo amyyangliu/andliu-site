@@ -216,17 +216,23 @@
     .logo-face {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       will-change: transform, opacity;
-      transition: transform 420ms cubic-bezier(.4,0,.2,1), opacity 420ms cubic-bezier(.4,0,.2,1);
+      transition: transform 300ms ease-in-out, opacity 300ms ease-in-out;
     }
     .logo-face img {
       display: block; max-width: 100%; width: auto; height: auto;
       max-height: calc(clamp(22px, 2.6vw, 32px) * var(--logo-scale, 1));
       object-fit: contain; filter: brightness(0);
     }
-    .logo-face--next { transform: translateY(22px); opacity: 0; }
-    .logo-slot.is-flipping .logo-face--current { transform: translateY(-22px); opacity: 0; }
-    .logo-slot.is-flipping .logo-face--next { transform: translateY(0); opacity: 1; }
-    .logo-slot.no-transition .logo-face { transition: none; }
+    /* The incoming face waits 20px ABOVE its resting spot, and the outgoing face leaves to
+       that same spot. Because "staged" and "spent" are the same position, the handoff at the
+       end of a flip can swap the two faces' roles without moving either one -- which is what
+       keeps the arriving logo perfectly still once it lands. (The old version staged the
+       incoming face 22px BELOW while the outgoing one left upward; those two positions
+       disagreed, so every flip had to yank the just-arrived logo back into place.) */
+    .logo-face--current { transform: translateY(0); opacity: 1; }
+    .logo-face--next    { transform: translateY(-20px); opacity: 0; }
+    .logo-slot.is-flipping .logo-face--current { transform: translateY(-20px); opacity: 0; }
+    .logo-slot.is-flipping .logo-face--next    { transform: translateY(0); opacity: 1; }
     .logo-slot, .logo-slot img {
       -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
@@ -643,7 +649,7 @@
       frieslandcampina: { src: 'images/logos/frieslandcampina.png', alt: 'FrieslandCampina' }
     };
     var keys = Object.keys(ASSETS), start = 0, timer, running = false;
-    var FLIP_MS = 420, REST_MS = 1800;
+    var FLIP_MS = 300, REST_MS = 1800;
 
     // Load the two initially hidden brands before the first flip.
     keys.forEach(function (key) { var img = new Image(); img.src = ASSETS[key].src; });
@@ -655,30 +661,39 @@
 
     function flip() {
       start = (start + slots.length) % keys.length;
+      // Only ever write a src into the hidden face, so no visible image is swapped mid-flight.
       var nextKeys = slots.map(function (slot, i) {
         var key = keys[(start + i) % keys.length];
         var nextFace = slot.querySelector('.logo-face--next');
+        var img = nextFace.querySelector('img');
         nextFace.dataset.logo = key;
-        nextFace.querySelector('img').src = ASSETS[key].src;
+        img.src = ASSETS[key].src;
         return key;
       });
       requestAnimationFrame(function () {
         slots.forEach(function (slot) { slot.classList.add('is-flipping'); });
         setTimeout(function () {
           slots.forEach(function (slot, i) {
-            var key = nextKeys[i], currentFace = slot.querySelector('.logo-face--current');
-            var current = currentFace.querySelector('img');
-            slot.classList.add('no-transition');
-            current.src = ASSETS[key].src;
-            current.alt = ASSETS[key].alt;
-            currentFace.dataset.logo = key;
-            slot.dataset.logo = key;
+            var key = nextKeys[i];
+            var cur = slot.querySelector('.logo-face--current');
+            var nxt = slot.querySelector('.logo-face--next');
+            // Hand over by trading roles rather than copying the image into the face that is
+            // on screen. The arriving face is already sitting at translateY(0)/opacity 1 and
+            // --current resolves to exactly that, so it does not move again; the spent face
+            // is already at translateY(-20px)/opacity 0, which is exactly --next. Both
+            // elements keep the position they already hold, so nothing snaps and the swap
+            // costs no frames -- and because the targets are unchanged, a timer that fires a
+            // frame early simply lets the same transition finish rather than jumping.
+            cur.classList.replace('logo-face--current', 'logo-face--next');
+            nxt.classList.replace('logo-face--next', 'logo-face--current');
+            cur.setAttribute('aria-hidden', 'true');
+            cur.querySelector('img').alt = '';
+            nxt.removeAttribute('aria-hidden');
+            nxt.querySelector('img').alt = ASSETS[key].alt;
             slot.classList.remove('is-flipping');
+            slot.dataset.logo = key;
           });
-          requestAnimationFrame(function () {
-            slots.forEach(function (slot) { slot.classList.remove('no-transition'); });
-            schedule(REST_MS);
-          });
+          schedule(REST_MS);
         }, FLIP_MS);
       });
     }
