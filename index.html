@@ -1003,6 +1003,34 @@ if(!location.hash || location.hash === '#top')play();
       });
     }
 
+    // Sushi, cake, and the golf ball are pre-rendered 24x24-grid pixel-art PNGs (matching the
+    // fish's own cell size below) rather than hand-coded grids like the fish above.
+    var GOODY_SRC = { sushi: 'images/cat-goodies/sushi-roll.png', cake: 'images/cat-goodies/cake-slice.png', golf: 'images/cat-goodies/golf-ball.png' };
+    var goodyImages = {};
+    Object.keys(GOODY_SRC).forEach(function (key) {
+      var img = new Image();
+      img.src = GOODY_SRC[key];
+      goodyImages[key] = img;
+    });
+    function drawGoodyImage(key, cx, cy, scale) {
+      if (scale <= 0.02) return;
+      var img = goodyImages[key];
+      if (!img.complete || !img.naturalWidth) return;
+      var px = Math.max(1, Math.round(4 * scale));
+      var size = 24 * px;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, Math.round(cx - size / 2), Math.round(cy - size / 2), size, size);
+    }
+    function drawGoody(key, cx, cy, scale) {
+      if (key === 'fish') drawTuna(cx, cy, scale);
+      else drawGoodyImage(key, cx, cy, scale);
+    }
+    // Feed drops cycle fish -> sushi -> cake -> golf ball, repeating. The cat eats the first
+    // three; the golf ball bounces and rolls away instead (see the feed drawing block below).
+    var FEED_ITEMS = ['fish', 'sushi', 'cake', 'golf'];
+    var feedIndex = 0;
+    var feedItem = 'fish';
+
     stage.addEventListener('click', function (e) {
       var b = stage.getBoundingClientRect(), h = home();
       var x = e.clientX - b.left, y = e.clientY - b.top;
@@ -1011,7 +1039,7 @@ if(!location.hash || location.hash === '#top')play();
       if (x > h.x + catX && x < h.x + catX + W * S && y > h.y && y < h.y + H * S) {
         pets++;
         floatSprite('heart', 0.41, 3 + Math.ceil(pets * 0.7), RAINBOW[(pets - 1) % RAINBOW.length]);
-        if (pets >= 5) { pets = 0; phase = 'feed'; t = 0; }
+        if (pets >= 5) { pets = 0; phase = 'feed'; t = 0; feedItem = FEED_ITEMS[feedIndex % FEED_ITEMS.length]; feedIndex++; }
       }
     });
 
@@ -1099,9 +1127,11 @@ if(!location.hash || location.hash === '#top')play();
       }
       if (phase === 'feed') {
         var mouthX = ox + 14 * S, mouthY = oy + 11 * S;
+        var eaten = feedItem !== 'golf';
         // A black pill/oval on its side -- flat across the middle, rounding off only at
-        // the two ends -- rather than a tapered dome, and a bit bigger overall.
-        if (t >= 1800) {
+        // the two ends -- rather than a tapered dome, and a bit bigger overall. Only the
+        // eaten treats (fish/sushi/cake) get a bite; the golf ball never reaches the mouth.
+        if (eaten && t >= 1800) {
           var opening = Math.max(0, Math.min(1, (t - 1800) / 220)) *
             Math.max(0, Math.min(1, (2770 - t) / 220));
           var lip = [0, 3, 6, 7, 7, 7, 7, 6, 3, 0];
@@ -1113,15 +1143,31 @@ if(!location.hash || location.hash === '#top')play();
           });
         }
         if (t < 2600) {
-          // Slower fall, a gentle rebound, then a readable hold before the gulp.
-          var swallow = Math.max(0, Math.min(1, (t - 1950) / 650));
-          var fall = Math.min(t / 1200, 1);
-          var fishY = reduceMotion ? mouthY - 40 : -30 + (mouthY - 40 + 30) * fall * fall;
-          if (!reduceMotion && t >= 1200 && t < 1550) {
-            fishY -= Math.sin(Math.PI * (t - 1200) / 350) * 12;
+          if (eaten) {
+            // Slower fall, a gentle rebound, then a readable hold before the gulp.
+            var swallow = Math.max(0, Math.min(1, (t - 1950) / 650));
+            var fall = Math.min(t / 1200, 1);
+            var fishY = reduceMotion ? mouthY - 40 : -30 + (mouthY - 40 + 30) * fall * fall;
+            if (!reduceMotion && t >= 1200 && t < 1550) {
+              fishY -= Math.sin(Math.PI * (t - 1200) / 350) * 12;
+            }
+            fishY += 40 * ease(swallow);
+            drawGoody(feedItem, mouthX, fishY, 1 - ease(swallow));
+          } else {
+            // The golf ball is never swallowed: it falls, bounces on the ground a
+            // couple of times with decaying height, and rolls off to the side.
+            var groundY = mouthY - 6;
+            if (reduceMotion) {
+              drawGoody('golf', mouthX, groundY, 1);
+            } else if (t < 1100) {
+              var gfall = Math.min(t / 1100, 1);
+              drawGoody('golf', mouthX, -30 + (groundY + 30) * gfall * gfall, 1);
+            } else {
+              var bt = Math.min((t - 1100) / 1500, 1);
+              var bounce = Math.abs(Math.sin(bt * Math.PI * 2.2)) * 18 * (1 - bt);
+              drawGoody('golf', mouthX + ease(bt) * 90, groundY - bounce, 1);
+            }
           }
-          fishY += 40 * ease(swallow);
-          drawTuna(mouthX, fishY, 1 - ease(swallow));
         }
       }
     }
