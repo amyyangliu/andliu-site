@@ -114,12 +114,19 @@
       .topline .mini-mark { font-size: 28px; }
     }
 
+    /* The ampersand's swash descends ~16.7% of the font size below the baseline, but
+       line-height .91 ends the line box at ~12.3%, so the swash overflows by ~4.4% and
+       eats into the gap above the rule -- worse the wider the screen, since the wordmark
+       is viewport-scaled. Pad the difference back so the optical gap above the rule stays
+       put, and keep the wordmark size in one variable so the two can't drift apart. */
     .masthead {
+      --wm-size: clamp(63px, 12vw, 189px);
       display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      gap: 24px; padding: 10px var(--gutter) 20px; border-bottom: 1px solid var(--ink);
+      gap: 24px; padding: 10px var(--gutter) calc(16px + 0.044 * var(--wm-size));
+      border-bottom: 1px solid var(--ink);
     }
     .wordmark {
-      font-family: 'Italiana', serif; font-size: clamp(63px, 12vw, 189px); font-weight: 400;
+      font-family: 'Italiana', serif; font-size: var(--wm-size); font-weight: 400;
       line-height: 0.91; letter-spacing: -0.065em; margin: 0; white-space: nowrap;
     }
     .wordmark a:hover { text-decoration: none; }
@@ -130,12 +137,13 @@
     }
     .slogan span { display: block; color: var(--accent); }
     @media (max-width: 600px) {
-      .masthead { padding: 10px 16px 20px; gap: 20px; }
-      .wordmark { font-size: 18vw; }
+      .masthead { --wm-size: 18vw; padding: 10px 16px calc(16px + 0.044 * var(--wm-size)); gap: 20px; }
       .slogan { font-size: 2.7vw; max-width: 51%; letter-spacing: -0.025em; }
     }
 
-    .details { padding: 14px var(--gutter) 0; font-size: 12px; }
+    /* 11px, not 16: the mono copy carries ~5px of leading above its cap height, so 11px of
+       padding reads as the same ~16px of optical space the rule has above it. */
+    .details { padding: 11px var(--gutter) 0; font-size: 12px; }
     .statement {
       font-size: clamp(22px, 2.7vw, 47px); line-height: 1.13; font-weight: 400; letter-spacing: -0.045em;
       margin: 22px var(--gutter) 34px; max-width: 1450px;
@@ -614,14 +622,19 @@
     if (!slots.length) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    // Point at the full-colour originals and let the CSS `filter: brightness(0)` on
+    // .logo-face img do the blackening. The old grey/*.png set was faded to 75% opacity
+    // rather than recoloured, so black could never actually reach black through it --
+    // 75%-alpha black over the cream page composites to rgb(63,63,63). Sourcing the
+    // originals keeps one source of truth and makes the row black by construction.
     var ASSETS = {
-      hm:               { src: 'images/logos/grey/hm.png',               alt: 'H&M' },
-      unilever:         { src: 'images/logos/grey/unilever.png',         alt: 'Unilever' },
-      heineken:         { src: 'images/logos/grey/heineken.png',         alt: 'Heineken' },
-      samsung:          { src: 'images/logos/grey/samsung.png',          alt: 'Samsung' },
-      amgen:            { src: 'images/logos/grey/amgen.png',            alt: 'Amgen' },
-      underarmour:      { src: 'images/logos/grey/underarmour.png',      alt: 'Under Armour' },
-      frieslandcampina: { src: 'images/logos/grey/frieslandcampina.png', alt: 'FrieslandCampina' }
+      hm:               { src: 'images/logos/hm.svg',               alt: 'H&M' },
+      unilever:         { src: 'images/logos/unilever.svg',         alt: 'Unilever' },
+      heineken:         { src: 'images/logos/heineken.svg',         alt: 'Heineken' },
+      samsung:          { src: 'images/logos/samsung.svg',          alt: 'Samsung' },
+      amgen:            { src: 'images/logos/amgen.svg',            alt: 'Amgen' },
+      underarmour:      { src: 'images/logos/underarmour.svg',      alt: 'Under Armour' },
+      frieslandcampina: { src: 'images/logos/frieslandcampina.png', alt: 'FrieslandCampina' }
     };
     var keys = Object.keys(ASSETS), start = 0, timer, running = false;
     var FLIP_MS = 420, REST_MS = 1800;
