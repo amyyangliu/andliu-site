@@ -231,15 +231,6 @@
       transition: opacity 700ms cubic-bezier(.45,0,.15,1);
     }
     .logo-face--color img { width: 100%; object-fit: contain; }
-    /* Under Armour's mark itself is plain black -- no brand color lives in the logo file, it
-       lives in the red background UA always puts behind it. Recreate that: a red badge behind
-       the mark, with the mark inverted to white so it reads against the red. Keyed off
-       data-logo, which the script updates live as the slot's content changes. */
-    .logo-slot[data-logo="underarmour"] .logo-face--color {
-      background: #C8102E;
-      padding: 8px 14px;
-    }
-    .logo-slot[data-logo="underarmour"] .logo-face--color img { filter: brightness(0) invert(1); }
     .logo-slot.is-color .logo-face--color { opacity: 1; }
     .logo-slot, .logo-slot img {
       -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
@@ -1072,15 +1063,18 @@ if(!location.hash || location.hash === '#top')play();
     ];
     var nigiriColors = { S: '#F2887A', H: '#FBB3A6', s: '#D4685C', R: '#FFFAF5', r: '#E9DCD0', K: '#B9564A' };
 
-    // An anime-style anger mark: four blunt veins radiating from a hollow centre.
+    // Four bent, connected strokes read as the familiar manga anger vein at pixel size.
+    // Keep the centre tight; a wide hollow turns the mark into four separate spikes.
     var anger = [
-      "..V.V..",
-      ".VV.VV.",
-      "VV...VV",
-      ".......",
-      "VV...VV",
-      ".VV.VV.",
-      "..V.V.."
+      ".........",
+      ".VVV.VVV.",
+      ".V.....V.",
+      ".VV...VV.",
+      "...VVV...",
+      ".VV...VV.",
+      ".V.....V.",
+      ".VVV.VVV.",
+      "........."
     ];
     var angerColors = { V: '#E23B2E' };
 
@@ -1278,14 +1272,14 @@ if(!location.hash || location.hash === '#top')play();
             }
           }
         }
-        // A golf ball is not food. The cat pops an anger mark on its left temple the
-        // moment the ball lands and keeps it for the rest of the beat.
+        // A golf ball is not food. The anger mark pops beside the cat's left ear
+        // when the ball lands, where it stays readable against the black background.
         if (!eaten) {
           var ang = reduceMotion ? 400 : t - 1040;
           if (ang > 0) {
             var pop = Math.min(ang / 170, 1);
             var angScale = pop < 1 ? 0.45 + 0.55 * pop : 1 + Math.sin(ang / 190) * 0.07;
-            drawPixelGrid(anger, angerColors, ox + 6 * S, oy + 4 * S, angScale, 1, 0);
+            drawPixelGrid(anger, angerColors, ox, oy + 6 * S, angScale, 1, 0);
           }
         }
       }
