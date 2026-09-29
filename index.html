@@ -194,9 +194,19 @@
     .about .eyebrow { color: #fff; opacity: 0.85; }
     .about h2 { font-family: 'Marcellus', serif; font-weight: 400; font-size: clamp(36px, 4.6vw, 70px); line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 30px; color: #fff; }
     .about p { font-size: 18px; line-height: 1.65; max-width: 600px; margin: 0 0 20px; opacity: 0.85; color: #fff; }
-    /* width/height attrs + height:auto reserve the photo's space before it lazy-loads, so
-       "Let's talk" -> #contact doesn't land short when it pops in and pushes the page down */
-    .portrait { width: 100%; height: auto; max-height: 540px; object-fit: cover; object-position: center 35%; }
+    /* aspect-ratio reserves the photo's space before it lazy-loads (same job the old
+       width/height + height:auto trick did), so "Let's talk" -> #contact doesn't land short
+       when it pops in and pushes the page down. */
+    .portrait { position: relative; width: 100%; aspect-ratio: 1122 / 1402; max-height: 540px; perspective: 1000px; }
+    /* Two faces holding the SAME photo, stacked with backface-visibility:hidden and the back
+       one pre-rotated 180deg. .spin-inner turns 0->360 on trigger: the front face is what's on
+       screen at 0deg and again at 360deg (the end looks identical to the start, so there's
+       nothing to "unspin" on mouse-out), and the back face -- the same photo -- covers the
+       middle of the turn. Two faces of one photo means no mirrored flash and no gap mid-turn. */
+    .portrait .spin-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .portrait .spin-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+    .portrait .spin-face--back { transform: rotateY(180deg); }
+    .portrait .spin-face img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; display: block; -webkit-user-drag: none; user-select: none; }
     @media (max-width: 600px) { .about { grid-template-columns: 1fr; padding: 65px 16px; gap: 30px; } .about p { font-size: 16px; } .portrait { max-height: 380px; } }
 
     .experience { padding: 30px var(--gutter) 70px; }
@@ -503,7 +513,16 @@
       <p>I founded &amp;Liu Studio to bring agency-level craft directly to startups and independent businesses.</p>
       <p>My agency experience includes work for brands like Samsung and Heineken. Now, I work directly with you to shape a website and identity that feel like your business, with the same care and fewer layers.</p>
     </div>
-    <img class="portrait" src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" width="1122" height="1402" loading="lazy">
+    <div class="portrait">
+      <div class="spin-inner" id="portraitSpin">
+        <div class="spin-face spin-face--front">
+          <img src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" width="1122" height="1402" loading="lazy">
+        </div>
+        <div class="spin-face spin-face--back" aria-hidden="true">
+          <img src="images/hero-amy.jpg" alt="" width="1122" height="1402" loading="lazy">
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="testimonial" id="testimonial" aria-labelledby="testimonial-heading" aria-roledescription="carousel">
@@ -951,6 +970,36 @@
       pending.add(el);
       observer.observe(el);
     });
+  })();
+</script>
+
+<script>
+  // About portrait: a full 360deg spin on desktop hover / mobile tap (see .portrait's CSS
+  // comment for how the two-face structure keeps it a solid-looking spin, no mirror/gap).
+  // One-shot per trigger via Web Animations, not a CSS :hover transition -- a transition
+  // would also animate BACKWARDS on mouse-out (a second, reversed spin nobody asked for),
+  // since 0deg and 360deg are visually identical there's nothing to reverse back to anyway.
+  (function () {
+    var box = document.querySelector('.portrait');
+    var inner = document.getElementById('portraitSpin');
+    if (!box || !inner) return;
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var spinning = false, turns = 0;
+    function spin() {
+      if (spinning || reduced) return;
+      spinning = true;
+      turns += 360;
+      var anim = inner.animate(
+        [{ transform: 'rotateY(' + (turns - 360) + 'deg)' }, { transform: 'rotateY(' + turns + 'deg)' }],
+        { duration: 750, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
+      );
+      anim.finished.then(function () { spinning = false; }).catch(function () { spinning = false; });
+    }
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      box.addEventListener('mouseenter', spin);
+    } else {
+      box.addEventListener('click', function (e) { e.preventDefault(); spin(); });
+    }
   })();
 </script>
 
