@@ -1112,12 +1112,12 @@ if(!location.hash || location.hash === '#top')play();
       ctx.restore();
     }
 
-    // The cake and golf ball are pre-rendered pixel-art PNGs drawn on a 24x24 grid. Sized
-    // down per item so they read at the fish's weight instead of towering over it: the fish
-    // occupies a 22x13-cell box, so a 24-cell square was nearly twice its height.
-    var GOODY_SRC = { cake: 'images/cat-goodies/cake-slice.png', golf: 'images/cat-goodies/golf-ball.png' };
-    var GOODY_CELLS = { cake: 15, golf: 10 };
-    var GOODY_TILT = { nigiri: -0.30, cake: -0.24 };
+    // The golf ball is a pre-rendered pixel-art PNG drawn on a 24x24 grid. Sized down so it
+    // reads at the fish's weight instead of towering over it: the fish occupies a 22x13-cell
+    // box, so a 24-cell square was nearly twice its height.
+    var GOODY_SRC = { golf: 'images/cat-goodies/golf-ball.png' };
+    var GOODY_CELLS = { golf: 10 };
+    var GOODY_TILT = { nigiri: -0.30 };
     var goodyImages = {};
     Object.keys(GOODY_SRC).forEach(function (key) {
       var img = new Image();
@@ -1143,9 +1143,9 @@ if(!location.hash || location.hash === '#top')play();
       else if (key === 'nigiri') drawPixelGrid(nigiri, nigiriColors, cx, cy, scale, 0.9, GOODY_TILT.nigiri);
       else drawGoodyImage(key, cx, cy, scale);
     }
-    // Feed drops cycle fish -> nigiri -> cake -> golf ball, repeating. The cat eats the first
-    // three; the golf ball bounces and rolls away instead (see the feed drawing block below).
-    var FEED_ITEMS = ['fish', 'nigiri', 'cake', 'golf'];
+    // Feed drops cycle fish -> nigiri -> golf ball, repeating. The cat eats the first two;
+    // the golf ball bounces and rolls away instead (see the feed drawing block below).
+    var FEED_ITEMS = ['fish', 'nigiri', 'golf'];
     var feedIndex = 0;
     var feedItem = 'fish';
 
@@ -1248,7 +1248,7 @@ if(!location.hash || location.hash === '#top')play();
         var eaten = feedItem !== 'golf';
         // A black pill/oval on its side -- flat across the middle, rounding off only at
         // the two ends -- rather than a tapered dome, and a bit bigger overall. Only the
-        // eaten treats (fish/sushi/cake) get a bite; the golf ball never reaches the mouth.
+        // eaten treats (fish/sushi) get a bite; the golf ball never reaches the mouth.
         if (eaten && t >= 1800) {
           var opening = Math.max(0, Math.min(1, (t - 1800) / 220)) *
             Math.max(0, Math.min(1, (2770 - t) / 220));
