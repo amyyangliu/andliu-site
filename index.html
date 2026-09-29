@@ -345,6 +345,32 @@
       .offer-bottom { display: block; }
       .offer-bottom p { margin-top: 20px; }
     }
+
+    /* ------------------------------------------------------------------
+       TESTIMONIAL
+       ------------------------------------------------------------------ */
+    .testimonial { background: var(--cream); padding: clamp(72px, 8vw, 116px) var(--gutter) clamp(82px, 9vw, 130px); }
+    .testimonial__inner { max-width: 1300px; margin: 0 auto; padding-top: 28px; border-top: 1px solid rgba(0,0,0,.42); display: grid; grid-template-columns: minmax(180px, .28fr) minmax(0, 1fr); gap: clamp(34px, 5vw, 90px); }
+    .testimonial__rail { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; }
+    .testimonial__label { margin: 3px 0 0; font-size: 12px; }
+    .testimonial__mark { color: var(--accent); font-family: 'Marcellus', serif; font-size: clamp(96px, 10vw, 150px); line-height: .6; margin: 0 0 5px -7px; }
+    .testimonial blockquote { margin: 0; }
+    .testimonial__quote { margin: 0; max-width: 960px; font-family: 'Marcellus', Georgia, serif; font-size: clamp(27px, 3.05vw, 43px); line-height: 1.27; letter-spacing: -.018em; text-wrap: pretty; }
+    .testimonial__credit { border-top: 1px solid rgba(0,0,0,.23); margin-top: clamp(38px, 5vw, 64px); padding-top: 22px; display: flex; align-items: center; gap: 18px; }
+    /* colour headshot, desaturated in CSS so the source stays reusable */
+    .testimonial__portrait { display: block; width: 76px; height: 76px; flex: none; object-fit: cover; filter: grayscale(1); }
+    .testimonial__name { display: block; font-size: 15px; font-weight: 600; }
+    .testimonial__roles { font-size: 14px; line-height: 1.55; color: #514942; }
+    .testimonial__roles span { display: block; }
+    @media (max-width: 760px) {
+      .testimonial { padding: 60px 16px 74px; }
+      .testimonial__inner { display: block; padding-top: 22px; }
+      .testimonial__mark { display: none; }
+      .testimonial__quote { font-size: clamp(25px, 6vw, 32px); line-height: 1.32; margin-top: 42px; }
+      .testimonial__credit { margin-top: 38px; padding-top: 18px; gap: 14px; }
+      .testimonial__portrait { width: 68px; height: 68px; }
+      .testimonial__roles { margin-top: 5px; font-size: 13px; }
+    }
   </style>
 </head>
 <body>
@@ -472,6 +498,28 @@
         <div class="logo-slot" data-logo="samsung"><span class="logo-face logo-face--current" data-logo="samsung"><img src="images/logos/samsung.svg" alt="Samsung"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
         <div class="logo-slot" data-logo="amgen"><span class="logo-face logo-face--current" data-logo="amgen"><img src="images/logos/amgen.svg" alt="Amgen"></span><span class="logo-face logo-face--next" aria-hidden="true"><img alt=""></span></div>
       </div>
+    </div>
+  </section>
+
+  <section class="testimonial" id="testimonial" aria-labelledby="testimonial-heading">
+    <div class="testimonial__inner">
+      <div class="testimonial__rail">
+        <h2 class="testimonial__label mono" id="testimonial-heading">Kind words / 01</h2>
+        <span class="testimonial__mark" aria-hidden="true">&ldquo;</span>
+      </div>
+      <blockquote>
+        <p class="testimonial__quote">Amy has the rare ability to understand people, distill complex ideas, and turn them into clear, compelling experiences. The strategic thinking, creativity, and audience intuition she brings to her work is dynamic and impactful. Those strengths translate naturally into the brand and digital experiences she creates today. She&rsquo;s an exceptional and highly collaborative partner.</p>
+        <footer class="testimonial__credit">
+          <img class="testimonial__portrait" src="images/kevin-stapp-headshot.png" alt="Portrait of Kevin Stapp" width="225" height="225" loading="lazy">
+          <div>
+            <strong class="testimonial__name">Kevin Stapp</strong>
+            <div class="testimonial__roles">
+              <span>Chief People Officer, L.A.B. Golf</span>
+              <span>Former VP of HR, Shiseido Americas</span>
+            </div>
+          </div>
+        </footer>
+      </blockquote>
     </div>
   </section>
 
