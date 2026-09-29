@@ -350,24 +350,42 @@
        TESTIMONIAL
        ------------------------------------------------------------------ */
     .testimonial { background: var(--cream); padding: clamp(72px, 8vw, 116px) var(--gutter) clamp(82px, 9vw, 130px); }
-    .testimonial__inner { max-width: 1300px; margin: 0 auto; padding-top: 28px; border-top: 1px solid rgba(0,0,0,.42); display: grid; grid-template-columns: minmax(180px, .28fr) minmax(0, 1fr); gap: clamp(34px, 5vw, 90px); }
-    .testimonial__rail { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; }
-    .testimonial__label { margin: 3px 0 0; font-size: 12px; }
-    .testimonial__mark { color: var(--accent); font-family: 'Marcellus', serif; font-size: clamp(96px, 10vw, 150px); line-height: .6; margin: 0 0 5px -7px; }
-    .testimonial blockquote { margin: 0; }
-    .testimonial__quote { margin: 0; max-width: 960px; font-family: 'Marcellus', Georgia, serif; font-size: clamp(27px, 3.05vw, 43px); line-height: 1.27; letter-spacing: -.018em; text-wrap: pretty; }
-    .testimonial__credit { border-top: 1px solid rgba(0,0,0,.23); margin-top: clamp(38px, 5vw, 64px); padding-top: 22px; display: flex; align-items: center; gap: 18px; }
-    /* colour headshot, desaturated in CSS so the source stays reusable */
+    .testimonial__inner { max-width: 1300px; margin: 0 auto; padding-top: 28px; border-top: 1px solid rgba(0,0,0,.42); }
+    .testimonial__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: clamp(42px, 6vw, 86px); }
+    .testimonial__label { margin: 0; font-size: 12px; }
+    .testimonial__count { font-size: 11px; white-space: nowrap; }
+    .testimonial__stage { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; grid-template-areas: 'previous viewport next'; align-items: center; gap: clamp(18px, 3vw, 54px); }
+    .testimonial__arrow { width: 52px; height: 52px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(0,0,0,.58); border-radius: 50%; background: transparent; color: var(--ink); font: 27px/1 'Archivo', sans-serif; cursor: pointer; transition: background .2s ease, color .2s ease; }
+    .testimonial__arrow--prev { grid-area: previous; }
+    .testimonial__arrow--next { grid-area: next; }
+    .testimonial__arrow:hover:not(:disabled) { background: var(--ink); color: var(--cream); }
+    .testimonial__arrow:disabled { opacity: .28; cursor: default; }
+    .testimonial__viewport { grid-area: viewport; min-width: 0; overflow: hidden; touch-action: pan-y; }
+    .testimonial__viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .testimonial__track { display: flex; transition: transform .48s cubic-bezier(.22, .8, .2, 1); }
+    .testimonial__slide { flex: 0 0 100%; min-width: 0; }
+    .testimonial blockquote { max-width: 880px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+    .testimonial blockquote::before { content: '“'; display: block; color: var(--accent); font-family: 'Marcellus', serif; font-size: 72px; line-height: .65; margin: 0 0 30px; }
+    .testimonial__quote { margin: 0; padding-bottom: clamp(38px, 5vw, 64px); font-family: 'Marcellus', Georgia, serif; font-size: clamp(27px, 2.7vw, 38px); line-height: 1.3; letter-spacing: -.018em; text-wrap: pretty; }
+    .testimonial__credit { border-top: 1px solid rgba(0,0,0,.23); margin-top: auto; padding-top: 22px; display: flex; align-items: center; gap: 18px; }
+    /* colour headshots, desaturated in CSS so the sources stay reusable */
     .testimonial__portrait { display: block; width: 76px; height: 76px; flex: none; object-fit: cover; filter: grayscale(1); }
     .testimonial__name { display: block; font-size: 15px; font-weight: 600; }
     .testimonial__roles { font-size: 14px; line-height: 1.55; color: #514942; }
     .testimonial__roles span { display: block; }
+    @media (prefers-reduced-motion: reduce) { .testimonial__track, .testimonial__arrow { transition: none; } }
     @media (max-width: 760px) {
       .testimonial { padding: 60px 16px 74px; }
-      .testimonial__inner { display: block; padding-top: 22px; }
-      .testimonial__mark { display: none; }
-      .testimonial__quote { font-size: clamp(25px, 6vw, 32px); line-height: 1.32; margin-top: 42px; }
-      .testimonial__credit { margin-top: 38px; padding-top: 18px; gap: 14px; }
+      .testimonial__inner { padding-top: 22px; }
+      .testimonial__header { margin-bottom: 42px; }
+      .testimonial__stage { grid-template-columns: 1fr 1fr; grid-template-areas: 'viewport viewport' 'previous next'; gap: 30px 12px; }
+      .testimonial__arrow { width: 46px; height: 46px; font-size: 24px; }
+      .testimonial__arrow--prev { justify-self: end; }
+      .testimonial__arrow--next { justify-self: start; }
+      .testimonial__count { font-size: 10px; }
+      .testimonial blockquote::before { font-size: 60px; margin-bottom: 24px; }
+      .testimonial__quote { font-size: clamp(25px, 6vw, 32px); line-height: 1.32; padding-bottom: 38px; }
+      .testimonial__credit { padding-top: 18px; gap: 14px; }
       .testimonial__portrait { width: 68px; height: 68px; }
       .testimonial__roles { margin-top: 5px; font-size: 13px; }
     }
@@ -488,25 +506,63 @@
     <img class="portrait" src="images/hero-amy.jpg" alt="Amy Liu speaking on stage at a conference" width="1122" height="1402" loading="lazy">
   </section>
 
-  <section class="testimonial" id="testimonial" aria-labelledby="testimonial-heading">
+  <section class="testimonial" id="testimonial" aria-labelledby="testimonial-heading" aria-roledescription="carousel">
     <div class="testimonial__inner">
-      <div class="testimonial__rail">
-        <h2 class="testimonial__label mono" id="testimonial-heading">Kind words / 01</h2>
-        <span class="testimonial__mark" aria-hidden="true">&ldquo;</span>
+      <div class="testimonial__header">
+        <h2 class="testimonial__label mono" id="testimonial-heading">Kind words</h2>
+        <span class="testimonial__count mono" aria-live="polite">01 / 03</span>
       </div>
-      <blockquote>
-        <p class="testimonial__quote">Amy has the rare ability to understand people, distill complex ideas, and turn them into clear, compelling experiences. The strategic thinking, creativity, and audience intuition she brings to her work is dynamic and impactful. Those strengths translate naturally into the brand and digital experiences she creates today. She&rsquo;s an exceptional and highly collaborative partner.</p>
-        <footer class="testimonial__credit">
-          <img class="testimonial__portrait" src="images/kevin-stapp-headshot.png" alt="Portrait of Kevin Stapp" width="225" height="225" loading="lazy">
-          <div>
-            <strong class="testimonial__name">Kevin Stapp</strong>
-            <div class="testimonial__roles">
-              <span>Chief People Officer, L.A.B. Golf</span>
-              <span>Former VP of HR, Shiseido Americas</span>
+      <div class="testimonial__stage">
+        <button class="testimonial__arrow testimonial__arrow--prev" type="button" aria-label="Previous testimonial" aria-controls="testimonial-viewport" disabled>&larr;</button>
+        <div class="testimonial__viewport" id="testimonial-viewport" tabindex="0" aria-label="Testimonials; use the arrow buttons to browse">
+          <div class="testimonial__track">
+            <div class="testimonial__slide" role="group" aria-roledescription="slide" aria-label="Kevin Stapp">
+              <blockquote>
+                <p class="testimonial__quote">Amy has the rare ability to understand people, distill complex ideas, and turn them into clear, compelling experiences. The strategic thinking, creativity, and audience intuition she brings to her work is dynamic and impactful. Those strengths translate naturally into the brand and digital experiences she creates today. She&rsquo;s an exceptional and highly collaborative partner.</p>
+                <footer class="testimonial__credit">
+                  <img class="testimonial__portrait" src="images/kevin-stapp-headshot.png" alt="Portrait of Kevin Stapp" width="225" height="225" loading="lazy">
+                  <div>
+                    <strong class="testimonial__name">Kevin Stapp</strong>
+                    <div class="testimonial__roles">
+                      <span>Chief People Officer, L.A.B. Golf</span>
+                      <span>Former VP of HR, Shiseido Americas</span>
+                    </div>
+                  </div>
+                </footer>
+              </blockquote>
+            </div>
+            <div class="testimonial__slide" role="group" aria-roledescription="slide" aria-label="Ines Lopez">
+              <blockquote>
+                <p class="testimonial__quote">Amy is a professional guided by the ultimate goal of a project. Through insightful questions, she kept us focused in our customers&rsquo; needs. She has a talent for understanding working processes, a visionary mindset and an impressive discipline in the operational level. Having her involved added a layer of quality to both the outcome and the process of the project.</p>
+                <footer class="testimonial__credit">
+                  <img class="testimonial__portrait" src="images/ines-lopez-headshot.png" alt="Portrait of Ines Lopez" width="400" height="400" loading="lazy">
+                  <div>
+                    <strong class="testimonial__name">Ines Lopez</strong>
+                    <div class="testimonial__roles">
+                      <span>Head of Methodology and Development, Hyper Island</span>
+                    </div>
+                  </div>
+                </footer>
+              </blockquote>
+            </div>
+            <div class="testimonial__slide" role="group" aria-roledescription="slide" aria-label="Sean Little">
+              <blockquote>
+                <p class="testimonial__quote">Amy&rsquo;s attention to detail is unrivaled, and her ability to learn a new, often complex subject in a short amount of time sets her apart from others. She has taken on important marketing functions and grown them exponentially, most notably her management of our B2C content which has been revitalized under her watch. Amy is someone you want to partner with if you&rsquo;re serious about growing.</p>
+                <footer class="testimonial__credit">
+                  <img class="testimonial__portrait" src="images/sean-little-headshot.png" alt="Portrait of Sean Little" width="100" height="100" loading="lazy">
+                  <div>
+                    <strong class="testimonial__name">Sean Little</strong>
+                    <div class="testimonial__roles">
+                      <span>Head of Marketing, Scout Alarm</span>
+                    </div>
+                  </div>
+                </footer>
+              </blockquote>
             </div>
           </div>
-        </footer>
-      </blockquote>
+        </div>
+        <button class="testimonial__arrow testimonial__arrow--next" type="button" aria-label="Next testimonial" aria-controls="testimonial-viewport">&rarr;</button>
+      </div>
     </div>
   </section>
 
@@ -1359,6 +1415,55 @@ if(!location.hash || location.hash === '#top')play();
         });
       }, { threshold: [0, 0.5] }).observe(perch);
     } else { visible = true; started = true; }
+  })();
+</script>
+<script>
+  // Testimonial carousel: arrows, arrow keys and swipe only -- no autoplay.
+  (function () {
+    var carousel = document.querySelector('.testimonial');
+    if (!carousel) return;
+    var viewport = carousel.querySelector('.testimonial__viewport');
+    var track = carousel.querySelector('.testimonial__track');
+    var slides = Array.from(carousel.querySelectorAll('.testimonial__slide'));
+    var previous = carousel.querySelector('.testimonial__arrow--prev');
+    var next = carousel.querySelector('.testimonial__arrow--next');
+    var count = carousel.querySelector('.testimonial__count');
+    var current = 0;
+    var touchStartX = null;
+    var touchStartY = null;
+
+    function showSlide(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      track.style.transform = 'translate3d(-' + (current * 100) + '%, 0, 0)';
+      count.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+      previous.disabled = current === 0;
+      next.disabled = current === slides.length - 1;
+      slides.forEach(function (slide, slideIndex) {
+        slide.setAttribute('aria-hidden', slideIndex === current ? 'false' : 'true');
+        slide.inert = slideIndex !== current;
+      });
+    }
+
+    previous.addEventListener('click', function () { showSlide(current - 1); });
+    next.addEventListener('click', function () { showSlide(current + 1); });
+    viewport.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        showSlide(current + (event.key === 'ArrowRight' ? 1 : -1));
+      }
+    });
+    viewport.addEventListener('touchstart', function (event) {
+      touchStartX = event.changedTouches[0].screenX;
+      touchStartY = event.changedTouches[0].screenY;
+    }, { passive: true });
+    viewport.addEventListener('touchend', function (event) {
+      if (touchStartX === null) return;
+      var dx = event.changedTouches[0].screenX - touchStartX;
+      var dy = event.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) showSlide(current + (dx < 0 ? 1 : -1));
+      touchStartX = touchStartY = null;
+    }, { passive: true });
+    showSlide(0);
   })();
 </script>
 </body>
